@@ -1,0 +1,8 @@
+*.sdf
+*.db
+*.suo
+Debug/
+*.filters
+*.user
+HTC Lighthouse Tracking Example/Release/
+Release/

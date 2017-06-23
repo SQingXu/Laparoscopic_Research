@@ -1,0 +1,16 @@
+LaproscopicProject2/Temp
+LaproscopicProject2/HoloApp
+UnityProject/Temp
+UnityProject/HoloApp
+
+*.opendb
+*.sdf
+*.db
+*.suo
+Debug/
+*.filters
+*.user
+ViveTracker_Sender-master/HTC Lighthouse Tracking Example/Release/
+Release/
+
+

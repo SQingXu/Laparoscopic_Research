@@ -1,0 +1,11 @@
+fileFormatVersion: 2
+guid: fdd2adda4e958a5478fbe98d37b42d83
+timeCreated: 1497927134
+licenseType: Free
+ShaderImporter:
+  defaultTextures:
+  - _ColorTex: {fileID: 10300, guid: 0000000000000000f000000000000000, type: 0}
+  - _DepthTex: {fileID: 10300, guid: 0000000000000000f000000000000000, type: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
