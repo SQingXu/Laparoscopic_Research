@@ -12,5 +12,6 @@ Debug/
 *.user
 ViveTracker_Sender-master/HTC Lighthouse Tracking Example/Release/
 Release/
-
+RealSensePluginSource/projects/CameraViewer/build/
+RealSensePluginSource/build
 
