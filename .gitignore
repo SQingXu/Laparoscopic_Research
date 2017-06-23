@@ -1,7 +1,10 @@
-LaproscopicProject2/Temp
+LaproscopicProject2/Temp/
 LaproscopicProject2/HoloApp
-UnityProject/Temp
+LaproscopicProject2/Library/
+UnityProjet/Library/
+UnityProject/Temp/
 UnityProject/HoloApp
+
 
 *.opendb
 *.sdf
@@ -13,5 +16,5 @@ Debug/
 ViveTracker_Sender-master/HTC Lighthouse Tracking Example/Release/
 Release/
 RealSensePluginSource/projects/CameraViewer/build/
-RealSensePluginSource/build
+RealSensePluginSource/build/
 
