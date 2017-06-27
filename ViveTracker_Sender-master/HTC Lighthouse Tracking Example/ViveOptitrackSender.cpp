@@ -16,6 +16,7 @@
 #include <sstream>
 //#include <iomanip>
 
+
 //std::string optitrackIP = "127.0.0.1";
 std::string optitrackIP = "10.100.35.254";
 
@@ -105,7 +106,8 @@ public:
 
 			std::cout << "pos:" << formatV(opos,3,3) << ", " << formatV(lpos,3,3) << " ";
 			//std::cout << "rot:" << formatQ(orot,3,3) << ", " << formatQ(lrot,3,3) << std::endl;
-			std::cout << "rot:" << formatV(glm::eulerAngles(orot), 3, 3) << ", " << formatV(glm::eulerAngles(lrot), 3, 3) << std::endl;
+			//std::cout << "rot:" << formatV(glm::eulerAngles(orot), 3, 3) << ", " << formatV(glm::eulerAngles(lrot), 3, 3) << std::endl;
+			std::cout << "rot:" << formatV(glm::eulerAngles(orot), 3, 3) << ", " << formatQ(lrot, 4, 3) << std::endl;
 			//std::cout << "rot:" << formatV(glm::vec3(orb.euler.at(0), orb.euler.at(1), orb.euler.at(2)), 3, 3) << ", " << formatV(glm::eulerAngles(lrot), 3, 3) << std::endl;
 			// a delay to not overheat your computer... :)
 			Sleep(100);
@@ -123,11 +125,19 @@ public:
 
 	void on_vive_update() {
 		//std::cout << "vive update" << std::endl;
-		/*if (!enable_streaming)
-		return;
-		update_positions();
-		update_orientations();
-		send_tracker_data();*/
+
+		//auto orb = optitrack->getRigidBody(rigidBodyID);
+		//glm::vec3 opos(orb.pos.at(0), orb.pos.at(1), orb.pos.at(2));
+		//glm::quat orot(orb.quaternion.at(0), orb.quaternion.at(1), orb.quaternion.at(2), orb.quaternion.at(3));
+		//auto lp = lighthouseTracking->GetTrackerPosition();
+		//auto lr = lighthouseTracking->GetTrackerRotation();
+		//glm::vec3 lpos(lp);
+		//glm::quat lrot(lr);
+		//char buf[1024];
+		//sprintf_s(buf, sizeof(buf), "{ \"id\":\"tracker%i\",\"position\" : {\"x\":%.4f,\"y\" : %.4f,\"z\" : %.4f},\"rotation\" : {\"x\":%.8f,\"y\" : %.8f,\"z\" : %.8f,\"w\" : %.8f} }",
+		//	-1, position.v[0], position.v[1], position.v[2], quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+		////printf_s(buf);
+		//sendData(buf);
 	}
 };
 

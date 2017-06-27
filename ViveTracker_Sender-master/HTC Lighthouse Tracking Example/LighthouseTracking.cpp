@@ -785,6 +785,9 @@ void LighthouseTracking::ParseTrackingFrame() {
 							tracker_position = glm::vec3(position.v[0], position.v[1], position.v[2]);
 							tracker_quaternion = glm::quat(quaternion.w, quaternion.x, quaternion.y, quaternion.z);
 							tracker_quaternion = quaterniong;
+
+							for (auto c : callback)
+								c();
 						}
 					}
 					else

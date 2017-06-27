@@ -29,12 +29,16 @@ public class TrackerTransform
 public class HoloReceiver : MonoBehaviour
 {
 
-    public int port = 7778;
+    public int port = 9000;
     public bool follow = false;
     public string TrackerID = "tracker1";
 
+
     [Range(0f, 100.0f)]
     public float output_rate;// = 0.2f;
+    private Quaternion from0toTable;
+    Quaternion re_from0toTable;
+    private Vector3 meter_position;
 
     private HoloClient Instance { get; set; }
     // Use this for initialization
@@ -43,8 +47,63 @@ public class HoloReceiver : MonoBehaviour
     {
         this.Instance = this.gameObject.AddComponent<HoloClient>();
         this.Instance.Init(port, output_rate);
+        //right-handed quaternion
+        from0toTable = new Quaternion(0.666f, -0.230f, 0.230f, 0.671f);
+        Quaternion quatFromMToT = new Quaternion(-0.006f, -0.692f, 0.722f, 0.001f);
+        //Quaternion demo = new Quaternion(0.69288583f, 0.20189612f, -0.20377779f, -0.66152990f);
+        //Quaternion quatFromMToT = new Quaternion(0.017f, 0.655f, -0.755f, 0.006f);
+        Quaternion quatFromTToM = Quaternion.Inverse(quatFromMToT);
+        Quaternion pointQuat = Quaternion.Inverse(quatFromTToM * from0toTable);
+        Vector3 pos = new Vector3(-0.134f, -0.977f, -0.906f); //origin
+        //pos = new Vector3(-0.284f, -0.967f, -1.01f);//point2
+        //pos = new Vector3(-0.347f,-0.787f,-1.046f);//point3
+        //pos = new Vector3(-0.346f, -0.966f, -0.933f);//point4
+        //pos = new Vector3(-0.545f, -0.962f, -0.676f);//point5
+        Vector3 pos2 = this.rotateAroundAxis(pos, new Vector3(0, 0, 0), pointQuat);
+        Debug.Log("pos2 x: " + pos2.x + " y: " + pos2.y + " z: " + pos2.z);
 
-       // this.enabled = false;
+        Vector3 demo_euler = from0toTable.eulerAngles;
+
+        //Vector3 xyz = new Vector3(3, 6, 7);
+        //Quaternion XYZ = Quaternion.Euler(30, 50, 21);
+        //Vector3 xyz1 = this.rotateAroundAxis(xyz, new Vector3(0, 0, 0), XYZ);
+        //Quaternion in_XYZ = Quaternion.Inverse(XYZ);
+        //Vector3 xyz2 = this.rotateAroundAxis(xyz1, new Vector3(0, 0, 0), in_XYZ);
+        //Debug.Log("Inverse test x: " + xyz2.x + " y: " + xyz2.y + " z: " + xyz2.z);
+
+        //Debug.Log("x: " + demo_euler.x + " y: " + demo_euler.y + " z: " + demo_euler.z);
+        //change to left handed quaternion
+        //Vector3 fllipedRotation = new Vector3(demo_euler.x, -demo_euler.y, -demo_euler.z);
+        //Quaternion qx = Quaternion.AngleAxis(fllipedRotation.x, Vector3.right);
+        //Quaternion qy = Quaternion.AngleAxis(fllipedRotation.y, Vector3.up);
+        //Quaternion qz = Quaternion.AngleAxis(fllipedRotation.z, Vector3.forward);
+        //Quaternion demo_left = qz * qy * qx;
+
+        //Vector3 demo_euler_left = demo_left.eulerAngles;
+        //Debug.Log("x: " + demo_euler_left.x + " y: " + demo_euler_left.y + " z: " + demo_euler_left.z);
+
+
+        re_from0toTable = Quaternion.Inverse(from0toTable);
+        Vector3 position_new = this.rotateAroundAxis(pos, new Vector3(0, 0, 0), re_from0toTable);
+        //Debug.Log("new position after rotation x: " + position_new.x + " y: " + position_new.y + " z: " + position_new.z);
+
+        Vector3 mid_pos = this.rotateAroundAxis(pos, new Vector3(0, 0, 0), re_from0toTable);
+        Vector3 final_pos = new Vector3(mid_pos.x, mid_pos.z, -mid_pos.y);
+        //this.transform.localPosition = final_pos;
+        Quaternion change = Quaternion.FromToRotation(mid_pos, final_pos);
+        Quaternion re_from0toTable_left = new Quaternion(re_from0toTable.x,-re_from0toTable.y,-re_from0toTable.z,-re_from0toTable.w);
+        this.transform.parent.Find("ViveMeter").localPosition = final_pos;
+        meter_position = final_pos;
+        this.transform.parent.Find("ViveMeter").localRotation = Quaternion.Inverse(re_from0toTable * change);
+
+        // this.enabled = false;
+    }
+    Vector3 rotateAroundAxis(Vector3 point, Vector3 pivot, Quaternion quat)
+    {
+        Vector3 finalPos = point - pivot;
+        finalPos = quat * finalPos;
+        finalPos += pivot;
+        return finalPos;
     }
 
     // Update is called once per frame
@@ -96,18 +155,22 @@ public class HoloReceiver : MonoBehaviour
             //this.transform.localRotation = Quaternion.Euler(hmdRot);
 
             Vector3 pos = Instance.lastTrackerTransform.position;
-            pos = new Vector3(-pos.z, pos.y, pos.x);
+            Vector3 mid_pos = this.rotateAroundAxis(pos, new Vector3(0, 0, 0), re_from0toTable);
+            //position relative to vive meter
+            Vector3 mid2_pos = new Vector3(-mid_pos.x, -mid_pos.z, mid_pos.y);
+            Vector3 final_pos = meter_position + mid2_pos;
             //Vector3 hmdPos = Quaternion.Euler(90, 0, 0) * pos;
-            this.transform.localPosition = pos;
+            this.transform.localPosition = final_pos;
             //Debug.Log("Pos " + Instance.lastTrackerTransform.position + " - " + hmdPos);
 
             //Quaternion rot = Quaternion.Euler(90, 0, 0) * Quaternion.Inverse(Instance.lastTrackerTransform.rotation);
             Quaternion rot = (Instance.lastTrackerTransform.rotation);
             rot.x *= -1.0f;
             rot.y *= -1.0f;
-            //rot.z *= -1.0f;
+            rot.z *= -1.0f;
             rot = new Quaternion(rot.x, rot.y, rot.z, rot.w);
-            this.transform.localRotation = rot;
+            Quaternion change = Quaternion.RotateTowards(from0toTable, rot, 180);
+            this.transform.localRotation = change;
         }
     }
 
