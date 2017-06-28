@@ -93,7 +93,8 @@
 				//o.vertex.x = (sinhalfx * depth) * (v.uv[0] - 0.5f) * 2.0f;
 				//o.vertex.z = (sinhalfy * depth) * (0.5f - v.uv[1]) * 2.0f;
 
-				o.uv = TRANSFORM_TEX(v.uv, _DepthTex);
+				//o.uv = TRANSFORM_TEX(v.uv, _DepthTex);
+				o.uv = v.uv;
 				//UNITY_TRANSFER_FOG(o,o.vertex);
 				//o.vertex = UnityObjectToClipPos(o.vertex);
 				return o;

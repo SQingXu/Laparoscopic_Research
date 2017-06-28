@@ -46,7 +46,7 @@
 				float depth = -(tex2Dlod(_DepthTex, float4(v.uv, 0, 0)).r *65.536f );
 				/*if (depth == 0)
 					depth = -1000;*/
-				v.vertex.y = depth;
+				//v.vertex.y = depth;
 				//o.vertex = UnityObjectToClipPos(v.vertex);
 				o.vertex = v.vertex;
 				o.uv = TRANSFORM_TEX(v.uv, _ColorTex);
@@ -111,13 +111,13 @@
 				float a = 1.0f;
 				float b = 1.0f;
 				//float depth = (1.0f - (tex2D(_DepthTex, i.uv).r * 32.0f)) * 256.0f;
-				float depth = (tex2D(_DepthTex, i.uv).r * 32.0f) * 256.0f;
+				float depth = tex2D(_DepthTex, i.uv).r  * 65.536f;
 				//if (depth == 256) depth = 0;
 				//Unpack(depth, a, b);
-				//fixed4 col = (i.uv[0] < 0.5f) ? tex2D(RGBtex, i.uv) : fixed4(depth, depth, depth, 1.0f);// fixed4(a, a, a, 1.0f);
+				fixed4 col = (i.uv[0] < 0.5f) ? tex2D(_ColorTex, i.uv) : fixed4(depth, depth, depth, 1.0f);// fixed4(a, a, a, 1.0f);
 				//fixed4 col = fixed4(depth, depth, depth, 1.0f);// fixed4(a, a, a, 1.0f);
-				float grey = depth / (256.0f);
-				fixed4 col = fixed4(grey, grey, grey, 1.0f);
+				//float grey = depth / (256.0f);
+				//fixed4 col = fixed4(grey, grey, grey, 1.0f);
 				//fixed4 col = tex2D(_MainTex, i.uv);
 				// apply fog
 				//UNITY_APPLY_FOG(i.fogCoord, col);
