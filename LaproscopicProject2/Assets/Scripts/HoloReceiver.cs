@@ -89,12 +89,14 @@ public class HoloReceiver : MonoBehaviour
 
         Vector3 mid_pos = this.rotateAroundAxis(pos, new Vector3(0, 0, 0), re_from0toTable);
         Vector3 final_pos = new Vector3(mid_pos.x, mid_pos.z, -mid_pos.y);
+        Vector3 change_pos = new Vector3(-mid_pos.x, -mid_pos.z, mid_pos.y);
         //this.transform.localPosition = final_pos;
-        Quaternion change = Quaternion.FromToRotation(mid_pos, final_pos);
+        Quaternion change = Quaternion.FromToRotation(mid_pos, change_pos);
         Quaternion re_from0toTable_left = new Quaternion(re_from0toTable.x,-re_from0toTable.y,-re_from0toTable.z,-re_from0toTable.w);
         this.transform.parent.Find("ViveMeter").localPosition = final_pos;
         meter_position = final_pos;
-        this.transform.parent.Find("ViveMeter").localRotation = Quaternion.Inverse(re_from0toTable * change);
+        Quaternion from0toTable_left = new Quaternion(-from0toTable.x, -from0toTable.y, -from0toTable.z, from0toTable.w);
+        this.transform.parent.Find("ViveMeter").localRotation = re_from0toTable * change;
 
         // this.enabled = false;
     }
@@ -165,10 +167,10 @@ public class HoloReceiver : MonoBehaviour
 
             //Quaternion rot = Quaternion.Euler(90, 0, 0) * Quaternion.Inverse(Instance.lastTrackerTransform.rotation);
             Quaternion rot = (Instance.lastTrackerTransform.rotation);
-            rot.x *= -1.0f;
-            rot.y *= -1.0f;
-            rot.z *= -1.0f;
-            rot = new Quaternion(rot.x, rot.y, rot.z, rot.w);
+            //rot.x *= -1.0f;
+            //rot.y *= -1.0f;
+            //rot.z *= -1.0f;
+            //rot = new Quaternion(rot.x, rot.y, rot.z, rot.w);
             Quaternion change = Quaternion.RotateTowards(from0toTable, rot, 180);
             this.transform.localRotation = change;
         }
@@ -193,11 +195,8 @@ public class HoloReceiver : MonoBehaviour
 
     class HoloClient : MonoBehaviour
     {
-        public GameObject cube;
         private int port = 9000;
         private float output_rate = 0;
-        private bool TransformChange = false;
-        private bool FirstTransform = true;
         private TrackerTransform previousTrackerTransform = new TrackerTransform();
         private TrackerTransform _lastTrackerTransform = new TrackerTransform();
         public bool bTT = false;
