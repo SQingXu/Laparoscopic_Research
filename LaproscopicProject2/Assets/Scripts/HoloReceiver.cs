@@ -103,7 +103,8 @@ public class HoloReceiver : MonoBehaviour
         Vector3 init_pos = new Vector3(0.134f, -0.977f, -0.906f);
         Vector3 end_pos = new Vector3(0.6551008f, -0.9704683f, -0.6384149f);
         meter_rot = Quaternion.FromToRotation(init_pos, end_pos);
-
+        Quaternion re_rot = new Quaternion(from0toTable.x, from0toTable.z, -from0toTable.y, from0toTable.w);
+        rot_calib = Quaternion.Inverse(meter_rot * re_rot);
         this.transform.parent.Find("ViveMeter").localRotation = meter_rot;
 
         // this.enabled = false;
@@ -123,10 +124,20 @@ public class HoloReceiver : MonoBehaviour
         //string st = JsonUtility.ToJson(tt);
         ////Debug.Log("UPDATE");
         //Debug.Log(st);
+        //Debug.Log(Camera.main.transform.position);
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            Debug.Log("J pressed");
+        }
         if (Input.GetKeyDown(KeyCode.C) && !calibrating)
         {
             this.StartCalibrateOrigin();
             Debug.Log("C pressed");
+        }
+        if (Input.GetKeyDown(KeyCode.H) && !calibrating)
+        {
+            this.StartCalibrateHolo();
+            Debug.Log("H pressed");
         }
         //if (Instance.bTT)
         {
@@ -168,6 +179,8 @@ public class HoloReceiver : MonoBehaviour
             //Debug.Log("Rot " + Instance.lastTrackerTransform.rotation.eulerAngles + " - " + hmdRot);
             //this.transform.localRotation = Quaternion.Euler(hmdRot);
 
+
+           
             Vector3 pos = Instance.lastTrackerTransform.position;
             Vector3 mid_pos = this.rotateAroundAxis(pos, new Vector3(0, 0, 0), re_from0toTable);
             //position relative to vive meter
@@ -176,6 +189,12 @@ public class HoloReceiver : MonoBehaviour
             //Vector3 hmdPos = Quaternion.Euler(90, 0, 0) * pos;
             this.transform.localPosition = final_pos;
             //Debug.Log("Pos " + Instance.lastTrackerTransform.position + " - " + hmdPos);
+
+            Transform localToCamera = Camera.main.transform.Find("TrackerLocalToCamera");
+            Vector3 stablePosCalib = new Vector3(0, 0.055f, 0);
+            localToCamera.localPosition = stablePosCalib + Quaternion.Inverse(Camera.main.transform.rotation) * final_pos;
+            this.transform.position = localToCamera.position;
+
 
             //Quaternion rot = Quaternion.Euler(90, 0, 0) * Quaternion.Inverse(Instance.lastTrackerTransform.rotation);
             Quaternion rot = (Instance.lastTrackerTransform.rotation);
@@ -199,7 +218,9 @@ public class HoloReceiver : MonoBehaviour
             rot = new Quaternion(rot.x, rot.z, -rot.y, rot.w);
             Quaternion re_rot = new Quaternion(0.666f, 0.230f, 0.230f, 0.671f);
             //Quaternion re_from0toTable_left = new Quaternion(re_from0toTable.x, -re_from0toTable.y, -re_from0toTable.z, re_from0toTable.w);
-            Quaternion change = (Quaternion.Inverse(meter_rot * re_rot) * meter_rot * rot);
+
+            //Quaternion change = (Quaternion.Inverse(meter_rot * re_rot) * meter_rot * rot);
+            Quaternion change = rot_calib * meter_rot * rot;
             //Quaternion change_left = new Quaternion(-change.x, -change.y, -change.z, change.w);
             //Debug.Log(change);
             this.transform.localRotation = change;
@@ -220,6 +241,7 @@ public class HoloReceiver : MonoBehaviour
             Vector3 final_pos = new Vector3(mid_pos.x, mid_pos.z, -mid_pos.y);
             meter_position = final_pos;
 
+            this.transform.parent.Find("ViveMeter").localPosition = final_pos;
             //calibrate meter rotation
             Vector3 init_pos = pos;
             Vector3 end_pos = new Vector3(-mid_pos.x, -mid_pos.z, mid_pos.y);
@@ -227,6 +249,37 @@ public class HoloReceiver : MonoBehaviour
             meter_rot = Quaternion.FromToRotation(init_pos, end_pos);
 
            // Quaternion re_rot = new Quaternion(0.666f, 0.230f, 0.230f, 0.671f);
+            Quaternion re_rot = new Quaternion(from0toTable.x, from0toTable.z, -from0toTable.y, from0toTable.w);
+            rot_calib = Quaternion.Inverse(meter_rot * re_rot);
+            this.transform.parent.Find("ViveMeter").localRotation = meter_rot;
+
+            calibrating = false;
+        }
+        return;
+    }
+
+    void StartCalibrateHolo()
+    {
+        if (Instance.bTT)
+        {
+            Debug.Log("Start Holo Calibration Procedure");
+            calibrating = true;
+            //calibrate meter position
+            Vector3 pos = Instance.lastTrackerTransform.position;
+            from0toTable = Instance.lastTrackerTransform.rotation;
+            re_from0toTable = Quaternion.Inverse(from0toTable);
+            Vector3 mid_pos = this.rotateAroundAxis(pos, new Vector3(0, 0, 0), re_from0toTable);
+            Vector3 final_pos = new Vector3(mid_pos.x, mid_pos.z, -mid_pos.y);
+            meter_position = final_pos;
+            this.transform.parent.Find("ViveMeter").position = meter_position + Camera.main.transform.position + new Vector3(0, 0.055f, 0);
+
+            //calibrate meter rotation
+            Vector3 init_pos = pos;
+            Vector3 end_pos = new Vector3(-mid_pos.x, -mid_pos.z, mid_pos.y);
+            //Vector3 end_pos = new Vector3(0.6551008f, -0.9704683f, -0.6384149f);
+            meter_rot = Quaternion.FromToRotation(init_pos, end_pos);
+
+            // Quaternion re_rot = new Quaternion(0.666f, 0.230f, 0.230f, 0.671f);
             Quaternion re_rot = new Quaternion(from0toTable.x, from0toTable.z, -from0toTable.y, from0toTable.w);
             rot_calib = Quaternion.Inverse(meter_rot * re_rot);
 

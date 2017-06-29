@@ -75,7 +75,7 @@ bool bPrintControllers = false;
 
 bool bUpdateTrackers = true;
 bool bSendTrackers = true;
-bool bprintTrackers = false;
+bool bprintTrackers = true;
 
 // Destructor
 LighthouseTracking::~LighthouseTracking() {
