@@ -10,7 +10,7 @@ namespace PosterAlignment
         KeywordRecognizer keywordRecognizer = null;
         public ZoneCalibrationManager ZoneManager;
         public MultiPosterManager PostersManager;
-
+        public HoloReceiver HoloReceiver;
         Dictionary<string, System.Action> keywords = new Dictionary<string, System.Action>();
 
         // Use this for initialization
@@ -21,7 +21,6 @@ namespace PosterAlignment
                 this.enabled = false;
                 Debug.Log("Not Holo");
             }
-            Debug.Log("yes start");
         }
         void Start()
         {
@@ -77,10 +76,20 @@ namespace PosterAlignment
                     PostersManager.AlignAllPosters();
                 }
             });
+
+            keywords.Add("calibrate", () =>
+            {
+                Debug.Log("Calibrate with position of Vive Tracker");
+                if(HoloReceiver != null)
+                {
+                    HoloReceiver.StartCalibrateHolo();
+                    Debug.Log("Not null");
+                }
+            });
             keywordRecognizer = new KeywordRecognizer(keywords.Keys.ToArray());
             keywordRecognizer.OnPhraseRecognized += Keyword_OnRecognized;
             keywordRecognizer.Start();
-
+            Debug.Log("Speechmanager Started");
         }
 
         void Keyword_OnRecognized(PhraseRecognizedEventArgs arg)
