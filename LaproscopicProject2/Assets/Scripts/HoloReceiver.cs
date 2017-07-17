@@ -50,6 +50,7 @@ public class HoloReceiver : MonoBehaviour
     private Quaternion rot_calib;//need to be rotated before other rotation.
     private GameObject calibratedCam;
     private GameObject calibratedCamChild;
+    private GameObject tableChild;
     private bool calibrating = false;
 
     private HoloClient Instance { get; set; }
@@ -68,7 +69,8 @@ public class HoloReceiver : MonoBehaviour
         calibratedCam.transform.rotation = new Quaternion();
         calibratedCamChild = new GameObject("calibratedCamChild");
         calibratedCamChild.transform.parent = calibratedCam.transform;
-
+        tableChild = new GameObject("calibratedTableOrigin");
+        tableChild.transform.parent = this.transform;
         Vector3 pos = new Vector3(-0.134f, -0.977f, -0.906f); //origin
         //pos = new Vector3(-0.284f, -0.967f, -1.01f);//point2
         //pos = new Vector3(-0.347f,-0.787f,-1.046f);//point3
@@ -160,7 +162,7 @@ public class HoloReceiver : MonoBehaviour
 
             //version4
             rot = new Quaternion(rot.x, rot.z, -rot.y, rot.w);
-            Quaternion re_rot = new Quaternion(0.666f, 0.230f, 0.230f, 0.671f);
+            //Quaternion re_rot = new Quaternion(0.666f, 0.230f, 0.230f, 0.671f);
             //Quaternion re_from0toTable_left = new Quaternion(re_from0toTable.x, -re_from0toTable.y, -re_from0toTable.z, re_from0toTable.w);
 
             //Quaternion change = (Quaternion.Inverse(meter_rot * re_rot) * meter_rot * rot);
@@ -173,29 +175,13 @@ public class HoloReceiver : MonoBehaviour
 
     void StartCalibrateOrigin()
     {
-        if (Instance.bTT_0)
+        if (Instance.bTT_1)
         {
             Debug.Log("Start Calibration Procedure");
             calibrating = true;
-            //calibrate meter position
-            Vector3 pos = Instance.lastTrackerTransform_0.position;
-            from0toTable = Instance.lastTrackerTransform_0.rotation;
-            re_from0toTable = Quaternion.Inverse(from0toTable);
-            Vector3 mid_pos = this.rotateAroundAxis(pos, new Vector3(0, 0, 0), re_from0toTable);
-            Vector3 final_pos = new Vector3(mid_pos.x, mid_pos.z, -mid_pos.y);
-            meter_position = final_pos;
-
-            this.transform.parent.Find("ViveMeter").localPosition = final_pos;
-            //calibrate meter rotation
-            Vector3 init_pos = pos;
-            Vector3 end_pos = new Vector3(-mid_pos.x, -mid_pos.z, mid_pos.y);
-            //Vector3 end_pos = new Vector3(0.6551008f, -0.9704683f, -0.6384149f);
-            meter_rot = Quaternion.FromToRotation(init_pos, end_pos);
-
-           // Quaternion re_rot = new Quaternion(0.666f, 0.230f, 0.230f, 0.671f);
-            Quaternion re_rot = new Quaternion(from0toTable.x, from0toTable.z, -from0toTable.y, from0toTable.w);
-            rot_calib = Quaternion.Inverse(meter_rot * re_rot);
-            this.transform.parent.Find("ViveMeter").localRotation = meter_rot;
+            tableChild.transform.localPosition = new Vector3(0, 0.134f, 0);
+            this.transform.parent.Find("Origin").position = tableChild.transform.position;
+            this.transform.parent.Find("Origin").rotation = this.transform.rotation;
 
             calibrating = false;
         }
@@ -208,7 +194,7 @@ public class HoloReceiver : MonoBehaviour
         {
             Debug.Log("Start Holo Calibration Procedure");
             calibrating = true;
-            Vector3 stablePosCalib = new Vector3(0, 0.075f, 0.015f);
+            Vector3 stablePosCalib = new Vector3(0, 0.065f, 0);
             //calibrate meter position
             Vector3 pos = Instance.lastTrackerTransform_0.position;
             Vector3 camera_pos = Instance.lastTrackerTransform_0.cam_position; 
