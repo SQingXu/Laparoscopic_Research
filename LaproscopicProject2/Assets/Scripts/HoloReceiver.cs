@@ -21,9 +21,15 @@ public class TrackerTransform
     public string id;
     public Vector3 position;
     public Quaternion rotation;
+    public Vector3 cam_position;
+    public Quaternion cam_rotation;
 
-    public TrackerTransform() { id = "unspecified"; position = new Vector3(); rotation = new Quaternion(); }
-    public TrackerTransform(string id_, Vector3 pos, Quaternion quat) { id = id_; position = pos; rotation = quat; }
+    public TrackerTransform() { id = "unspecified"; position = new Vector3(); rotation = new Quaternion(); cam_position = new Vector3();
+        cam_rotation = new Quaternion();
+    }
+    public TrackerTransform(string id_, Vector3 pos, Quaternion quat) { id = id_; position = pos; rotation = quat; cam_position = new Vector3();
+        cam_rotation = new Quaternion();
+    }
 }
 
 public class HoloReceiver : MonoBehaviour
@@ -42,6 +48,8 @@ public class HoloReceiver : MonoBehaviour
     private Quaternion meter_rot;
     private Quaternion camera_rot;
     private Quaternion rot_calib;//need to be rotated before other rotation.
+    private GameObject calibratedCam;
+    private GameObject calibratedCamChild;
     private bool calibrating = false;
 
     private HoloClient Instance { get; set; }
@@ -55,11 +63,11 @@ public class HoloReceiver : MonoBehaviour
         from0toTable = new Quaternion(0.666f, -0.230f, 0.230f, 0.671f);
         re_from0toTable = Quaternion.Inverse(from0toTable);
 
-        //Quaternion quatFromMToT = new Quaternion(-0.006f, -0.692f, 0.722f, 0.001f);
-        //Quaternion demo = new Quaternion(0.69288583f, 0.20189612f, -0.20377779f, -0.66152990f);
-        //Quaternion quatFromMToT = new Quaternion(0.017f, 0.655f, -0.755f, 0.006f);
-        //Quaternion quatFromTToM = Quaternion.Inverse(quatFromMToT);
-        //Quaternion pointQuat = Quaternion.Inverse(quatFromTToM * from0toTable);
+        calibratedCam = new GameObject("calibratedCam");
+        calibratedCam.transform.position = new Vector3();
+        calibratedCam.transform.rotation = new Quaternion();
+        calibratedCamChild = new GameObject("calibratedCamChild");
+        calibratedCamChild.transform.parent = calibratedCam.transform;
 
         Vector3 pos = new Vector3(-0.134f, -0.977f, -0.906f); //origin
         //pos = new Vector3(-0.284f, -0.967f, -1.01f);//point2
@@ -113,70 +121,30 @@ public class HoloReceiver : MonoBehaviour
             this.StartCalibrateHolo();
             Debug.Log("H pressed");
         }
-        //if (Instance.bTT)
-        {
-            //
-            //Debug.Log("Applying Tracker Update");
 
-            //this.transform.position = Instance.lastTrackerTransform.position;
-            //this.transform.rotation = Instance.lastTrackerTransform.rotation;
-
-            //Camera.main.transform.position = Instance.lastTrackerTransform.position;
-            //Camera.main.transform.rotation = Instance.lastTrackerTransform.rotation;
-
-            //Debug.Log("Cam  " + Camera.main.transform.position.ToString());
-            //Debug.Log("CamF " + FakeCamera.transform.position.ToString());
-            //Debug.Log("Root " + transform.position.ToString());
-        }
-
-        if (Instance.bTT && !calibrating)
-        {
-            //Vector3 pos = Instance.lastTrackerTransform.position;
-            //pos = new Vector3(-pos.x, pos.y, pos.z);
-            ////Vector3 hmdPos = Quaternion.Euler(90, 0, 0) * pos;
-            //Vector3 hmdPos = pos + new Vector3(0f, .0f, 3.0f);
-            ////hmdPos.x *= -1.0f;
-            //this.transform.localPosition = hmdPos;
-            ////Debug.Log("Pos " + Instance.lastTrackerTransform.position + " - " + hmdPos);
-
-            ////Quaternion rot = Quaternion.Euler(90, 0, 0) * Quaternion.Inverse(Instance.lastTrackerTransform.rotation);
-            //Quaternion rot = (Instance.lastTrackerTransform.rotation);
-            //rot.x *= - 1.0f;
-            //rot.y *= -1.0f;
-            ////rot.z *= -1.0f;
-            //rot = new Quaternion(rot.x, rot.y, rot.z, rot.w);
-            //Quaternion quatB = Quaternion.AngleAxis(90, Vector3.right);
-            //Quaternion quatC = Quaternion.AngleAxis(180, Vector3.up);
-            //rot =  quatC *rot * quatB * quatC;
-            //Vector3 hmdRot = rot.eulerAngles;
-            ////hmdRot.x *= - 1.0f;
-            //Debug.Log("Rot " + Instance.lastTrackerTransform.rotation.eulerAngles + " - " + hmdRot);
-            //this.transform.localRotation = Quaternion.Euler(hmdRot);
-
-
-
-            Vector3 pos = Instance.lastTrackerTransform.position;
+        if (Instance.bTT_1 && !calibrating)
+        { 
+            Vector3 pos = Instance.lastTrackerTransform_1.position;
             Vector3 mid_pos = this.rotateAroundAxis(pos, new Vector3(0, 0, 0), re_from0toTable);
             //position relative to vive meter
             Vector3 mid2_pos = new Vector3(-mid_pos.x, -mid_pos.z, mid_pos.y);
             //Vector3 final_pos = meter_position + mid2_pos;
-            //Vector3 hmdPos = Quaternion.Euler(90, 0, 0) * pos;
-            //this.transform.localPosition = final_pos;
-
-            //Debug.Log("Pos " + Instance.lastTrackerTransform.position + " - " + hmdPos);
+            
 
 
-            Vector3 stablePosCalib = new Vector3(0, 0.055f, 0);
+            //Transform localToCamera = Camera.main.transform.Find("TrackerLocalToCamera");
+            //localToCamera.position = meter_position;
+            //localToCamera.localPosition = localToCamera.localPosition + mid2_pos;
+            //this.transform.position = localToCamera.position;
 
-            Transform localToCamera = Camera.main.transform.Find("TrackerLocalToCamera");
-            localToCamera.position = meter_position;
-            localToCamera.localPosition = localToCamera.localPosition + mid2_pos;
-
-            this.transform.position = localToCamera.position;
+            Transform calibratedChildTrans = calibratedCamChild.transform;
+            calibratedChildTrans.position = meter_position;
+            calibratedChildTrans.localPosition = calibratedChildTrans.localPosition + mid2_pos;
+            this.transform.position = calibratedChildTrans.position;
 
 
             //Quaternion rot = Quaternion.Euler(90, 0, 0) * Quaternion.Inverse(Instance.lastTrackerTransform.rotation);
-            Quaternion rot = (Instance.lastTrackerTransform.rotation);
+            Quaternion rot = (Instance.lastTrackerTransform_1.rotation);
 
             //version1 by far best (y axis works)
             //rot = new Quaternion(rot.x, -rot.y, -rot.z, rot.w);
@@ -205,13 +173,13 @@ public class HoloReceiver : MonoBehaviour
 
     void StartCalibrateOrigin()
     {
-        if (Instance.bTT)
+        if (Instance.bTT_0)
         {
             Debug.Log("Start Calibration Procedure");
             calibrating = true;
             //calibrate meter position
-            Vector3 pos = Instance.lastTrackerTransform.position;
-            from0toTable = Instance.lastTrackerTransform.rotation;
+            Vector3 pos = Instance.lastTrackerTransform_0.position;
+            from0toTable = Instance.lastTrackerTransform_0.rotation;
             re_from0toTable = Quaternion.Inverse(from0toTable);
             Vector3 mid_pos = this.rotateAroundAxis(pos, new Vector3(0, 0, 0), re_from0toTable);
             Vector3 final_pos = new Vector3(mid_pos.x, mid_pos.z, -mid_pos.y);
@@ -236,16 +204,16 @@ public class HoloReceiver : MonoBehaviour
 
     public void StartCalibrateHolo()
     {
-        if (Instance.bTT)
+        if (Instance.bTT_0)
         {
             Debug.Log("Start Holo Calibration Procedure");
             calibrating = true;
             Vector3 stablePosCalib = new Vector3(0, 0.075f, 0.015f);
             //calibrate meter position
-            Vector3 pos = Instance.lastTrackerTransform.position;
-            Vector3 camera_pos = Camera.main.transform.position; 
-            Quaternion tracker_ori = Instance.lastTrackerTransform.rotation;
-            camera_rot = Camera.main.transform.rotation;
+            Vector3 pos = Instance.lastTrackerTransform_0.position;
+            Vector3 camera_pos = Instance.lastTrackerTransform_0.cam_position; 
+            Quaternion tracker_ori = Instance.lastTrackerTransform_0.rotation;
+            camera_rot = Instance.lastTrackerTransform_0.cam_rotation;
             from0toTable = tracker_ori;
             re_from0toTable = Quaternion.Inverse(from0toTable);
 
@@ -254,7 +222,10 @@ public class HoloReceiver : MonoBehaviour
             Transform localToCamera = Camera.main.transform.Find("TrackerLocalToCamera");
             localToCamera.localPosition = final_pos + stablePosCalib;
             meter_position = localToCamera.position;
-            
+
+            calibratedCam.transform.position = camera_pos;
+            calibratedCam.transform.rotation = camera_rot;
+
             this.transform.parent.Find("ViveMeter").position = meter_position;
 
             //calibrate meter rotation
@@ -295,26 +266,48 @@ public class HoloReceiver : MonoBehaviour
     {
         private int port = 9000;
         private float output_rate = 0;
-        private TrackerTransform previousTrackerTransform = new TrackerTransform();
-        private TrackerTransform _lastTrackerTransform = new TrackerTransform();
-        public bool bTT = false;
+        private TrackerTransform _lastTrackerTransform_0 = new TrackerTransform();
+        private TrackerTransform _lastTrackerTransform_1 = new TrackerTransform();
+        public bool bTT_0 = false;
+        public bool bTT_1 = false;
+        public bool canReadCam_0 = false;
+        public bool canReadCam_1 = false;
 
-        private object _lock = new object();
+        private object _lock_0 = new object();
+        private object _lock_1 = new object();
 
-        public TrackerTransform lastTrackerTransform
+        public TrackerTransform lastTrackerTransform_0
         {
             get
             {
-                lock (_lock)
+                lock (_lock_0)
                 {
-                    return _lastTrackerTransform;
+                    return _lastTrackerTransform_0;
                 }
             }
             private set
             {
-                lock (_lock)
+                lock (_lock_0)
                 {
-                    _lastTrackerTransform = value;
+                    _lastTrackerTransform_0 = value;
+                }
+            }
+        }
+
+        public TrackerTransform lastTrackerTransform_1
+        {
+            get
+            {
+                lock (_lock_1)
+                {
+                    return _lastTrackerTransform_1;
+                }
+            }
+            private set
+            {
+                lock (_lock_1)
+                {
+                    _lastTrackerTransform_1 = value;
                 }
             }
         }
@@ -407,14 +400,20 @@ public class HoloReceiver : MonoBehaviour
         // Update is called once per frame
         void Update()
         {
-            //if (TransformChange == true)
-            //{
-            //    Vector3 positionChange = lastTrackerTransform.position - previousTrackerTransform.position;
-            //    //Quaternion rotationChange = lastTrackerTransform.rotation - previousTrackerTransform.rotation;
-            //    cube.transform.position = positionChange;
-            //    cube.transform.rotation = lastTrackerTransform.rotation;
-            //    TransformChange = false;
-            //}
+
+            if (canReadCam_0)
+            {
+                lastTrackerTransform_0.cam_position = Camera.main.transform.position;
+                lastTrackerTransform_0.cam_rotation = Camera.main.transform.rotation;
+                canReadCam_0 = false;
+            }
+            if (canReadCam_1)
+            {
+                lastTrackerTransform_1.cam_position = Camera.main.transform.position;
+                lastTrackerTransform_1.cam_rotation = Camera.main.transform.rotation;
+                canReadCam_1 = false;
+            }
+
             if (output_rate > 0)
             {
                 sps_time += Time.deltaTime;
@@ -423,23 +422,6 @@ public class HoloReceiver : MonoBehaviour
                     //Debug.Log("Net SPS: " + count_sps / sps_time);// + " - " + output_rate);
                     sps_time = 0;
                     count_sps = 0;
-                    //Debug.Log("TT " + lastTrackerTransform.id + " " + lastTrackerTransform.position + " Hr " + lastTrackerTransform.rotation.eulerAngles);
-                    //Debug.Log("Rp " + lastHoloTransform.rposition + " Rr " + lastHoloTransform.rrotation.eulerAngles);
-                    //Debug.Log("Ap " + lastHoloTransform.aposition + " Ar " + lastHoloTransform.arotation.eulerAngles);
-                    //Debug.Log("Pp " + lastHoloTransform.pposition + " Pr " + lastHoloTransform.protation.eulerAngles);
-                    //for(int i=0; i<lastHoloTransform.holoViewMatrices.Length; ++i)
-                    //for (int i = 0; i < 2; ++i)
-                    //{
-                    //    //V Debug.Log("HVM_" + i + ": " + lastHoloMatrices.holoViewMatrices[i].ToString());
-                    //    Debug.Log("HPM_" + i + ": " + lastHoloMatrices.holoProjMatrices[i].ToString());
-                    //}
-                    //Debug.Log("isStereo " + (lastHoloMatrices.isStereo ? "true":"false"));
-                    //Debug.Log("Separation " + lastHoloMatrices.separation);
-                    //Debug.Log("Convergence " + lastHoloMatrices.convergence);
-                    //Debug.Log("Near " + lastHoloMatrices.near);
-                    //Debug.Log("Far " + lastHoloMatrices.far);
-                    //Debug.Log("Fov " + lastHoloMatrices.fov);
-                    //Debug.Log("aspect " + lastHoloMatrices.aspect);
 
                 }
             }
@@ -477,9 +459,18 @@ public class HoloReceiver : MonoBehaviour
             TrackerTransform tt = JsonUtility.FromJson<TrackerTransform>(message);
             if (tt.id.Equals("tracker0"))
             {
-                bTT = true;
-                lastTrackerTransform = tt;
+                bTT_0 = true;
+                lastTrackerTransform_0 = tt;
+                canReadCam_0 = true;
+                //Debug.Log("HOLO " + ht.position.ToString() + " : " + ht.rotation.eulerAngles.ToString() + " from " + source);
 
+                ++count_sps;
+            }
+            if (tt.id.Equals("tracker1"))
+            {
+                bTT_1 = true;
+                lastTrackerTransform_1 = tt;
+                canReadCam_1 = true;
                 //Debug.Log("HOLO " + ht.position.ToString() + " : " + ht.rotation.eulerAngles.ToString() + " from " + source);
 
                 ++count_sps;
