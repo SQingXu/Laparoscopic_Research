@@ -104,10 +104,13 @@ public:
 			glm::vec3 lpos(lp);
 			glm::quat lrot(lr);
 
-			std::cout << "pos:" << formatV(opos,3,3) << ", " << formatV(lpos,3,3) << " ";
+			//std::cout << "pos:" << formatV(opos,3,3) << ", " << formatV(lpos,3,3) << " ";
+
 			//std::cout << "rot:" << formatQ(orot,3,3) << ", " << formatQ(lrot,3,3) << std::endl;
 			//std::cout << "rot:" << formatV(glm::eulerAngles(orot), 3, 3) << ", " << formatV(glm::eulerAngles(lrot), 3, 3) << std::endl;
-			std::cout << "rot:" << formatV(glm::eulerAngles(orot), 3, 3) << ", " << formatQ(lrot, 4, 3) << std::endl;
+
+			//std::cout << "rot:" << formatV(glm::eulerAngles(orot), 3, 3) << ", " << formatQ(lrot, 4, 3) << std::endl;
+
 			//std::cout << "rot:" << formatV(glm::vec3(orb.euler.at(0), orb.euler.at(1), orb.euler.at(2)), 3, 3) << ", " << formatV(glm::eulerAngles(lrot), 3, 3) << std::endl;
 			// a delay to not overheat your computer... :)
 			Sleep(100);

@@ -75,7 +75,7 @@ bool bPrintControllers = false;
 
 bool bUpdateTrackers = true;
 bool bSendTrackers = true;
-bool bprintTrackers = false;
+bool bprintTrackers = true;
 
 // Destructor
 LighthouseTracking::~LighthouseTracking() {
@@ -103,7 +103,7 @@ LighthouseTracking::LighthouseTracking() {
 	}
 
 	setupSocket("152.2.130.69","9000");
-	//setupSocket("127.0.0.1", "9000");
+	//setupSocket("152.23.19.157", "9000"); //Hololens
 	printf_s("Set up socket");
 	Sleep(2000);
 
@@ -742,7 +742,7 @@ void LighthouseTracking::ParseTrackingFrame() {
 					sprintf_s(buf, sizeof(buf), "\nTracker%i \nx: %.2f y: %.2f z: %.2f\n", unDevice, position.v[0], position.v[1], position.v[2]);
 					if (bprintTrackers) printf_s(buf);
 					sprintf_s(buf, sizeof(buf), "qw: %.2f qx: %.2f qy: %.2f qz: %.2f\n", quaternion.w, quaternion.x, quaternion.y, quaternion.z);
-					if (bprintTrackers) printf_s(buf);
+					//if (bprintTrackers) printf_s(buf);
 
 					// and print some more info to the user about the state of the device/pose
 					switch (eTrackingResult) {
@@ -777,7 +777,7 @@ void LighthouseTracking::ParseTrackingFrame() {
 					if (bPoseValid) {
 						sprintf_s(buf, sizeof(buf), "{ \"id\":\"tracker%i\",\"position\" : {\"x\":%.4f,\"y\" : %.4f,\"z\" : %.4f},\"rotation\" : {\"x\":%.8f,\"y\" : %.8f,\"z\" : %.8f,\"w\" : %.8f} }",
 							deviceSendId, position.v[0], position.v[1], position.v[2], quaternion.x, quaternion.y, quaternion.z, quaternion.w);
-						//printf_s(buf);
+						printf_s(buf);
 						if(bSendTrackers) sendData(buf);
 
 						{
