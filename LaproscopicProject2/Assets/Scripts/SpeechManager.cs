@@ -82,7 +82,7 @@ namespace PosterAlignment
                 Debug.Log("Calibrate with position of Vive Tracker");
                 if(HoloReceiver != null)
                 {
-                    HoloReceiver.StartCalibrateHolo();
+                    //HoloReceiver.StartCalibrateHolo();
                     Debug.Log("Not null");
                 }
             });
