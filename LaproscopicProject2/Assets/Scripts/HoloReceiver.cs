@@ -124,52 +124,87 @@ public class HoloReceiver : MonoBehaviour
             Debug.Log("H pressed");
         }
 
-        if (Instance.bTT_1 && !calibrating)
-        { 
-            Vector3 pos = Instance.lastTrackerTransform_1.position;
-            Vector3 mid_pos = this.rotateAroundAxis(pos, new Vector3(0, 0, 0), re_from0toTable);
+        //if (Instance.bTT_1 && !calibrating)
+        //{
+        //    Vector3 pos = Instance.lastTrackerTransform_1.position;
+        //    Vector3 mid_pos = this.rotateAroundAxis(pos, new Vector3(0, 0, 0), re_from0toTable);
+        //    //position relative to vive meter
+        //    Vector3 mid2_pos = new Vector3(-mid_pos.x, -mid_pos.z, mid_pos.y);
+        //    //Vector3 final_pos = meter_position + mid2_pos;
+
+
+
+        //    //Transform localToCamera = Camera.main.transform.Find("TrackerLocalToCamera");
+        //    //localToCamera.position = meter_position;
+        //    //localToCamera.localPosition = localToCamera.localPosition + mid2_pos;
+        //    //this.transform.position = localToCamera.position;
+
+        //    Transform calibratedChildTrans = calibratedCamChild.transform;
+        //    calibratedChildTrans.position = meter_position;
+        //    calibratedChildTrans.localPosition = calibratedChildTrans.localPosition + mid2_pos;
+        //    this.transform.position = calibratedChildTrans.position;
+
+
+        //    //Quaternion rot = Quaternion.Euler(90, 0, 0) * Quaternion.Inverse(Instance.lastTrackerTransform.rotation);
+        //    Quaternion rot = (Instance.lastTrackerTransform_1.rotation);
+
+        //    //version1 by far best (y axis works)
+        //    //rot = new Quaternion(rot.x, -rot.y, -rot.z, rot.w);
+        //    //Quaternion re_from0toTable_left = new Quaternion(re_from0toTable.x, -re_from0toTable.y, -re_from0toTable.z, re_from0toTable.w);
+
+        //    //version2 not working
+        //    //rot = new Quaternion(rot.x, -rot.z, -rot.y, rot.w);
+        //    //Quaternion re_from0toTable_left = new Quaternion(re_from0toTable.x, -re_from0toTable.z, -re_from0toTable.y, re_from0toTable.w);
+
+        //    //version3 not working
+        //    //rot = new Quaternion(-rot.x, rot.y, -rot.z, rot.w);
+        //    //Quaternion re_from0toTable_left = new Quaternion(-re_from0toTable.x, re_from0toTable.y, -re_from0toTable.z, re_from0toTable.w);
+
+        //    //version4
+        //    rot = new Quaternion(rot.x, rot.z, -rot.y, rot.w);
+        //    Quaternion change = rot_calib * meter_rot * rot;
+        //    this.transform.localRotation = camera_rot * change;
+        //}
+        if (Instance.bTT_0 && Instance.bTT_1 && !calibrating)
+        {
+            TrackerTransform TT0 = Instance.lastTrackerTransform_0;
+            TrackerTransform TT1 = Instance.lastTrackerTransform_1;
+            Vector3 stablePosCalib = new Vector3(0, 0.085f, 0.02f);
+            //meter raw data
+            Vector3 m_pos_raw = TT0.position;
+            Quaternion m_rot = TT0.rotation;
+            //tracker2 raw data
+            Vector3 t_pos_raw = TT1.position;
+            Quaternion t_rot = TT1.rotation;
+            //set camera position
+            calibratedCam.transform.position = TT0.cam_position;
+            calibratedCam.transform.rotation = TT0.cam_rotation;
+
+            //set meter position relative to Hololens
+            Quaternion re_m_rot = Quaternion.Inverse(m_rot);
+            Vector3 mid_pos = this.rotateAroundAxis(m_pos_raw, new Vector3(0, 0, 0), re_m_rot);
+            Vector3 m_final_pos = new Vector3(mid_pos.x, mid_pos.z, -mid_pos.y);
+            Transform localToCamera = Camera.main.transform.Find("TrackerLocalToCamera");
+            localToCamera.localPosition = m_final_pos + stablePosCalib;
+            meter_position = localToCamera.position;
+            this.transform.parent.Find("ViveMeter").position = meter_position;
+
+            //set tracker position
+            mid_pos = this.rotateAroundAxis(t_pos_raw, new Vector3(0, 0, 0), re_m_rot);
             //position relative to vive meter
             Vector3 mid2_pos = new Vector3(-mid_pos.x, -mid_pos.z, mid_pos.y);
-            //Vector3 final_pos = meter_position + mid2_pos;
-            
-
-
-            //Transform localToCamera = Camera.main.transform.Find("TrackerLocalToCamera");
-            //localToCamera.position = meter_position;
-            //localToCamera.localPosition = localToCamera.localPosition + mid2_pos;
-            //this.transform.position = localToCamera.position;
-
             Transform calibratedChildTrans = calibratedCamChild.transform;
             calibratedChildTrans.position = meter_position;
             calibratedChildTrans.localPosition = calibratedChildTrans.localPosition + mid2_pos;
             this.transform.position = calibratedChildTrans.position;
 
-
-            //Quaternion rot = Quaternion.Euler(90, 0, 0) * Quaternion.Inverse(Instance.lastTrackerTransform.rotation);
-            Quaternion rot = (Instance.lastTrackerTransform_1.rotation);
-
-            //version1 by far best (y axis works)
-            //rot = new Quaternion(rot.x, -rot.y, -rot.z, rot.w);
-            //Quaternion re_from0toTable_left = new Quaternion(re_from0toTable.x, -re_from0toTable.y, -re_from0toTable.z, re_from0toTable.w);
-
-            //version2 not working
-            //rot = new Quaternion(rot.x, -rot.z, -rot.y, rot.w);
-            //Quaternion re_from0toTable_left = new Quaternion(re_from0toTable.x, -re_from0toTable.z, -re_from0toTable.y, re_from0toTable.w);
-
-            //version3 not working
-            //rot = new Quaternion(-rot.x, rot.y, -rot.z, rot.w);
-            //Quaternion re_from0toTable_left = new Quaternion(-re_from0toTable.x, re_from0toTable.y, -re_from0toTable.z, re_from0toTable.w);
-
-            //version4
+            //set tracker rotation
+            Quaternion rot = TT1.rotation;
+           
             rot = new Quaternion(rot.x, rot.z, -rot.y, rot.w);
-            //Quaternion re_rot = new Quaternion(0.666f, 0.230f, 0.230f, 0.671f);
-            //Quaternion re_from0toTable_left = new Quaternion(re_from0toTable.x, -re_from0toTable.y, -re_from0toTable.z, re_from0toTable.w);
-
-            //Quaternion change = (Quaternion.Inverse(meter_rot * re_rot) * meter_rot * rot);
             Quaternion change = rot_calib * meter_rot * rot;
-            //Quaternion change_left = new Quaternion(-change.x, -change.y, -change.z, change.w);
-            //Debug.Log(change);
             this.transform.localRotation = camera_rot * change;
+            //Debug.Log(camera_rot * change );
         }
     }
 
@@ -179,7 +214,7 @@ public class HoloReceiver : MonoBehaviour
         {
             Debug.Log("Start Calibration Procedure");
             calibrating = true;
-            tableChild.transform.localPosition = new Vector3(0, 0.134f, 0);
+            tableChild.transform.localPosition = new Vector3(0, -0.134f, 0);
             this.transform.parent.Find("Origin").position = tableChild.transform.position;
             this.transform.parent.Find("Origin").rotation = this.transform.rotation;
 
