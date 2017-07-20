@@ -10,13 +10,14 @@
 	{
 		Tags { "RenderType"="Opaque" }
 		LOD 100
-
+		Cull Off
 		Pass
 		{
 			CGPROGRAM
 			#pragma vertex vert
             #pragma geometry geom
 			#pragma fragment frag
+			
 			// make fog work
 			//#pragma multi_compile_fog
 			
@@ -78,7 +79,7 @@
 				float y = (v.uv[1] * 480.0f - ppy) / fy;
 				//o.vertex.z = y;
 				//
-				o.vertex.x = -depth * x;
+				o.vertex.x = depth * x;
 				o.vertex.z = -depth * y;
 				o.vertex.y = depth;
 				o.vertex.w = 1.0f;

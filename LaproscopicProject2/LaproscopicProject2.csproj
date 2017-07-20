@@ -96,6 +96,7 @@
     <Compile Include="Assets\Scripts\HoloHelper.cs" />
     <Compile Include="Assets\Scripts\HoloReceiver.cs" />
     <Compile Include="Assets\Scripts\InstrumentMovement.cs" />
+    <Compile Include="Assets\Scripts\RSManualCalib.cs" />
     <Compile Include="Assets\Scripts\ReferenceCalibration.cs" />
     <Compile Include="Assets\Scripts\SpeechManager.cs" />
     <Compile Include="Assets\Scripts\UseRenderingPlugin.cs" />

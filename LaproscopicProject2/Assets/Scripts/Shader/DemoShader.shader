@@ -10,7 +10,7 @@
 	{
 		Tags { "RenderType"="Opaque" }
 		LOD 100
-
+		Cull Off
 		Pass
 		{
 			CGPROGRAM
@@ -79,7 +79,8 @@
 				//o.vertex.z = y;
 				//
 				o.vertex.x = -depth * x;
-				o.vertex.z = -depth * y;
+				//o.vertex.z = -depth * y;
+				o.vertex.z = depth * y;
 				o.vertex.y = depth;
 				o.vertex.w = 1.0f;
 
@@ -108,9 +109,12 @@
 				float4 vertex2 = input[1].vertex;
 				float4 vertex3 = input[2].vertex;
 
-				float diff1 = vertex1.y - vertex2.y;
+				/*float diff1 = vertex1.y - vertex2.y;
 				float diff2 = vertex1.y - vertex3.y;
-				float diff3 = vertex2.y - vertex3.y;
+				float diff3 = vertex2.y - vertex3.y;*/
+				float diff1 = vertex2.y - vertex1.y;
+				float diff2 = vertex3.y - vertex1.y;
+				float diff3 = vertex3.y - vertex2.y;
 
 				float soglia =  (0.03 + 0.008 * vertex1.y * vertex1.y);
 				//float soglia = 0.03;
