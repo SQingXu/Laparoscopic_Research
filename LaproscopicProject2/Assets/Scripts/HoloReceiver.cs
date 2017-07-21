@@ -36,6 +36,7 @@ public class HoloReceiver : MonoBehaviour
 {
 
     public int port = 9000;
+    private int drift = 10;
     public bool follow = false;
     public string TrackerID = "tracker1";
 
