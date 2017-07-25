@@ -48,6 +48,7 @@ public class HoloReceiver : MonoBehaviour
     Quaternion re_from0toTable;
     private Vector3 meter_position;
     private Vector3 counter_drift_total;
+    private Vector3 previous_drift_amount;
     private int drift_accum_curr;
     private Quaternion meter_rot;
     private Quaternion camera_rot;
@@ -61,6 +62,8 @@ public class HoloReceiver : MonoBehaviour
     private Quaternion storedTableRot;
     private bool calibrating = false;
     private bool calib_confirmed = false;
+    private bool first_tracking = true;
+
 
     private HoloClient Instance { get; set; }
     // Use this for initialization
@@ -188,6 +191,36 @@ public class HoloReceiver : MonoBehaviour
         {
             TrackerTransform TT0 = Instance.lastTrackerTransform_0;
             TrackerTransform TT1 = Instance.lastTrackerTransform_1;
+            if (TT0.position.x == 0 && TT0.position.y == 0 && TT0.position.z == 0 && TT0.rotation.x == 0 && TT0.rotation.y == 0 && TT0.rotation.z == 0 && TT0.rotation.w == 1.0f)
+            {
+                //Tracker0 Hololens one lose tracking
+                Debug.Log("Tracker 0 lost tracking");
+                this.GetComponent<Renderer>().material.color = Color.blue;
+                first_tracking = true;
+                return;
+            }
+            else
+            {
+                this.GetComponent<Renderer>().material.color = Color.white;
+            }
+            if (TT1.position.x == 0 && TT1.position.y == 0 && TT1.position.z == 0 && TT1.rotation.x == 0 && TT1.rotation.y == 0 && TT1.rotation.z == 0 && TT1.rotation.w == 1.0f)
+            {
+                //Tracker1 lose tracking
+                Debug.Log("Tracker 1 lost tracking");
+                this.GetComponent<Renderer>().material.color = Color.red;
+                first_tracking = true;
+                return;
+            }
+            else
+            {
+                this.GetComponent<Renderer>().material.color = Color.white;
+            }
+        }
+
+        if (Instance.bTT_0 && Instance.bTT_1 && !calibrating)
+        {
+            TrackerTransform TT0 = Instance.lastTrackerTransform_0;
+            TrackerTransform TT1 = Instance.lastTrackerTransform_1;
             Vector3 stablePosCalib = new Vector3(0, 0.1f, 0.02f);
             //meter raw data
             Vector3 m_pos_raw = TT0.position;
@@ -202,7 +235,7 @@ public class HoloReceiver : MonoBehaviour
             //set meter position relative to Hololens
             Quaternion re_m_rot = Quaternion.Inverse(m_rot);
             Vector3 mid_pos = this.rotateAroundAxis(m_pos_raw, new Vector3(0, 0, 0), re_m_rot);
-            
+
             if (calib_confirmed)
             {
                 Vector3 m_final_pos = new Vector3(mid_pos.x, mid_pos.z, -mid_pos.y);
@@ -210,21 +243,36 @@ public class HoloReceiver : MonoBehaviour
                 localToCamera.localPosition = m_final_pos + stablePosCalib;
                 //smooth the drift amount by specified number
                 Vector3 counter_drift_amount = localToCamera.position - meter_position;
-                counter_drift_total += counter_drift_amount;
-                drift_accum_curr++;
-                if(drift_accum_curr >= 30)
+                if (first_tracking)
+                {
+                    previous_drift_amount = counter_drift_amount;
+                    counter_drift_total += counter_drift_amount;
+                    drift_accum_curr++;
+                    first_tracking = false;
+                }
+                else
+                {
+                    if (Math.Abs((counter_drift_amount - previous_drift_amount).magnitude) <= 0.05f)
+                    {
+                        //Adding a threshold to the difference two continuous data;
+                        drift_accum_curr++;
+                        previous_drift_amount = counter_drift_amount;
+                        counter_drift_total += counter_drift_amount;
+                    }
+                }
+                if (drift_accum_curr >= 30)
                 {
                     Vector3 counter_drift_avg = counter_drift_total / 30;
                     meter_position = meter_position + counter_drift_avg;
-                    this.transform.parent.Find("ViveMeter").position = meter_position;
+                    GameObject.Find("ViveMeter").transform.position = meter_position;
                     drift_accum_curr = 0;
                     counter_drift_total = new Vector3(0, 0, 0);
                 }
 
                 storedTable.transform.localPosition = storedTablePos;
                 storedTable.transform.localRotation = storedTableRot;
-                this.transform.parent.Find("Origin").rotation = storedTable.transform.rotation;
-                this.transform.parent.Find("Origin").position = storedTable.transform.position;
+                this.transform.parent.Find("Origin").transform.rotation = storedTable.transform.rotation;
+                this.transform.parent.Find("Origin").transform.position = storedTable.transform.position;
             }
             else
             {
@@ -232,7 +280,7 @@ public class HoloReceiver : MonoBehaviour
                 Transform localToCamera = Camera.main.transform.Find("TrackerLocalToCamera");
                 localToCamera.localPosition = m_final_pos + stablePosCalib;
                 meter_position = localToCamera.position;
-                this.transform.parent.Find("ViveMeter").position = meter_position;
+                this.transform.parent.Find("ViveMeter").transform.position = meter_position;
             }
 
             //set tracker position

@@ -102,8 +102,8 @@ LighthouseTracking::LighthouseTracking() {
 		exit(EXIT_FAILURE);
 	}
 
-	setupSocket("152.2.130.69","9000");
-	//setupSocket("152.23.19.157", "9001"); //Hololens
+	//setupSocket("152.2.130.69","9000");
+	setupSocket("152.23.19.157", "9001"); //Hololens
 	printf_s("Set up socket");
 	Sleep(2000);
 
@@ -765,7 +765,7 @@ void LighthouseTracking::ParseTrackingFrame() {
 					case vr::ETrackingResult::TrackingResult_Running_OutOfRange:
 						sprintf_s(buf, sizeof(buf), "WARNING: Running Out of Range\n");
 						if (bprintTrackers) printf_s(buf);
-
+						bPoseValid = false;
 						break;
 					default:
 						sprintf_s(buf, sizeof(buf), "Default\n");
@@ -774,7 +774,7 @@ void LighthouseTracking::ParseTrackingFrame() {
 					}
 
 					// print if the pose is valid or not
-					if (bPoseValid) {
+					/*if (bPoseValid) {
 						sprintf_s(buf, sizeof(buf), "{ \"id\":\"tracker%i\",\"position\" : {\"x\":%.4f,\"y\" : %.4f,\"z\" : %.4f},\"rotation\" : {\"x\":%.8f,\"y\" : %.8f,\"z\" : %.8f,\"w\" : %.8f} }",
 							deviceSendId, position.v[0], position.v[1], position.v[2], quaternion.x, quaternion.y, quaternion.z, quaternion.w);
 						printf_s(buf);
@@ -791,7 +791,28 @@ void LighthouseTracking::ParseTrackingFrame() {
 						}
 					}
 					else
-						sprintf_s(buf, sizeof(buf), "Invalid pose\n");
+						sprintf_s(buf, sizeof(buf), "Invalid pose\n");*/
+					if (bPoseValid) {
+						sprintf_s(buf, sizeof(buf), "{ \"id\":\"tracker%i\",\"position\" : {\"x\":%.4f,\"y\" : %.4f,\"z\" : %.4f},\"rotation\" : {\"x\":%.8f,\"y\" : %.8f,\"z\" : %.8f,\"w\" : %.8f} }",
+							deviceSendId, position.v[0], position.v[1], position.v[2], quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+						printf_s(buf);
+					}
+					else {
+						sprintf_s(buf, sizeof(buf), "{ \"id\":\"tracker%i\",\"position\" : {\"x\":%.4f,\"y\" : %.4f,\"z\" : %.4f},\"rotation\" : {\"x\":%.8f,\"y\" : %.8f,\"z\" : %.8f,\"w\" : %.8f} }",
+							deviceSendId, position.v[0], position.v[1], position.v[2], quaternion.x, quaternion.y, quaternion.z, quaternion.w );
+						printf_s(buf);
+					}
+					if (bSendTrackers) sendData(buf);
+
+					{
+						std::lock_guard<std::mutex> lock(data_mutex);
+						tracker_position = glm::vec3(position.v[0], position.v[1], position.v[2]);
+						tracker_quaternion = glm::quat(quaternion.w, quaternion.x, quaternion.y, quaternion.z);
+						tracker_quaternion = quaterniong;
+
+						for (auto c : callback)
+							c();
+					}
 					
 
 				}
