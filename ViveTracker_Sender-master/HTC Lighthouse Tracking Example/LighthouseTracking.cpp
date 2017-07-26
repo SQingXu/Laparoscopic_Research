@@ -102,8 +102,8 @@ LighthouseTracking::LighthouseTracking() {
 		exit(EXIT_FAILURE);
 	}
 
-	//setupSocket("152.2.130.69","9000");
-	setupSocket("152.23.19.157", "9001"); //Hololens
+	setupSocket("152.2.130.69","9000");
+	//setupSocket("152.23.19.157", "9001"); //Hololens
 	printf_s("Set up socket");
 	Sleep(2000);
 
