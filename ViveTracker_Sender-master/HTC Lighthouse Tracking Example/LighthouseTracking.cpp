@@ -77,6 +77,10 @@ bool bUpdateTrackers = true;
 bool bSendTrackers = true;
 bool bprintTrackers = true;
 
+char serial0[24] = "LHR-0DC306CD";
+char serial1[24] = "LHR-14164681";
+bool tracker0_match = false;
+bool tracker1_match = false;
 // Destructor
 LighthouseTracking::~LighthouseTracking() {
 	if (m_pHMD != NULL)
@@ -455,6 +459,26 @@ void LighthouseTracking::ParseTrackingFrame() {
 			//sprintf_s(buf, sizeof(buf), "\ndevice %s\n", devclassname);//, vr::VRSystem()->GetStringTrackedDeviceProperty(unDevice, vr::ETrackedDeviceProperty::Prop_AttachedDeviceId_String);
 			//printf_s(buf);
 
+			char serialnum[24];
+			if (devclass == vr::ETrackedDeviceClass::TrackedDeviceClass_GenericTracker) {
+				vr::VRSystem()->GetStringTrackedDeviceProperty(unDevice, vr::ETrackedDeviceProperty::Prop_SerialNumber_String, serialnum, 24);
+				//sprintf_s(buf, sizeof(buf), "\nserial number: %s\n", serialnum);
+				//printf_s(buf);
+				
+				if (strcmp(serialnum,serial0) == 0) {
+					//printf_s("matching tracker 0");
+					tracker0_match = true;
+					tracker1_match = false;
+				}
+				else if (strcmp(serialnum, serial1) == 0) {
+					//printf_s("matching tracker 1");
+					tracker1_match = true;
+					tracker0_match = false;
+				}
+			}
+			
+			//vr::VRSystem()->GetStringTrackedDeviceProperty(vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_SerialNumber_String, desc.SerialNumber, 24);
+			
 			
 
 			//int m_iValidPoseCount = 0;
@@ -792,15 +816,34 @@ void LighthouseTracking::ParseTrackingFrame() {
 					}
 					else
 						sprintf_s(buf, sizeof(buf), "Invalid pose\n");*/
-					if (bPoseValid) {
-						sprintf_s(buf, sizeof(buf), "{ \"id\":\"tracker%i\",\"position\" : {\"x\":%.4f,\"y\" : %.4f,\"z\" : %.4f},\"rotation\" : {\"x\":%.8f,\"y\" : %.8f,\"z\" : %.8f,\"w\" : %.8f} }",
-							deviceSendId, position.v[0], position.v[1], position.v[2], quaternion.x, quaternion.y, quaternion.z, quaternion.w);
-						printf_s(buf);
+					int deviceId;
+					if (tracker0_match && !tracker1_match) {
+						deviceId = 0;
+					}
+					else if (!tracker0_match && tracker1_match) {
+						deviceId = 1;
+					}
+					else if (!tracker0_match && !tracker1_match) {
+						deviceId = 2; //invalid tracker
 					}
 					else {
-						sprintf_s(buf, sizeof(buf), "{ \"id\":\"tracker%i\",\"position\" : {\"x\":%.4f,\"y\" : %.4f,\"z\" : %.4f},\"rotation\" : {\"x\":%.8f,\"y\" : %.8f,\"z\" : %.8f,\"w\" : %.8f} }",
-							deviceSendId, position.v[0], position.v[1], position.v[2], quaternion.x, quaternion.y, quaternion.z, quaternion.w );
-						printf_s(buf);
+						deviceId = 3; //error
+					}
+					tracker0_match = false;
+					tracker1_match = false;
+
+					if (bprintTrackers) 
+					{
+						if (bPoseValid) {
+							sprintf_s(buf, sizeof(buf), "{ \"id\":\"tracker%i\",\"position\" : {\"x\":%.4f,\"y\" : %.4f,\"z\" : %.4f},\"rotation\" : {\"x\":%.8f,\"y\" : %.8f,\"z\" : %.8f,\"w\" : %.8f} }",
+								deviceId, position.v[0], position.v[1], position.v[2], quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+							printf_s(buf);
+						}
+						else {
+							sprintf_s(buf, sizeof(buf), "{ \"id\":\"tracker%i\",\"position\" : {\"x\":%.4f,\"y\" : %.4f,\"z\" : %.4f},\"rotation\" : {\"x\":%.8f,\"y\" : %.8f,\"z\" : %.8f,\"w\" : %.8f} }",
+								deviceId, position.v[0], position.v[1], position.v[2], quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+							printf_s(buf);
+						}
 					}
 					if (bSendTrackers) sendData(buf);
 
