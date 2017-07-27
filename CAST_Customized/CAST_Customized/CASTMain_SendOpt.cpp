@@ -1,12 +1,17 @@
 #include "stdafx.h"
 #include <iostream>
 #include "Hardware.h"
-
+#include "UDPSender.h"
 #include <Dense>
 using namespace Eigen;
 
+bool SendData = true;
+bool PrintData = true;
 int main()
 {
+	setupSocket("152.2.130.69","8500");
+	std::cout << "Socket set up successfully\n";
+
 	CHardware gHw = CHardware();
 	int scanRes = gHw.scanUSB4();
 	int initRes = _FAIL_;
@@ -38,16 +43,33 @@ int main()
 	gHw.resetPositionVariables(RIGHT);
 	gHw.resetAllEncoderValues(LEFT);
 	gHw.resetPositionVariables(LEFT);
+
+	char buf[1024];
 	while(true){
 		Sleep(1000);
 		gHw.updatePosition(RIGHT);
 		VectorXd rightpos = gHw.getPosition(RIGHT);
-		std::cout << "Right Pos x: " << rightpos[0] << " y: "<< rightpos[1] << " z: " << rightpos[2] << " ori " << rightpos[3] << "\n"; 
+		//std::cout << "Right Pos x: " << rightpos[0] << " y: "<< rightpos[1] << " z: " << rightpos[2] << " ori " << rightpos[3] << "\n"; 
 		gHw.updatePosition(LEFT);
 		VectorXd leftpos = gHw.getPosition(LEFT);
-		std::cout << "Left Pos x: " << leftpos[0] << " y: "<< leftpos[1] << " z: " << leftpos[2] << " ori " << leftpos[3] << "\n";
+		//std::cout << "Left Pos x: " << leftpos[0] << " y: "<< leftpos[1] << " z: " << leftpos[2] << " ori " << leftpos[3] << "\n";
+		sprintf_s(buf, sizeof(buf), "{ \"direction\":\"Left\",\"position\" : {\"x\":%.4f,\"y\" : %.4f,\"z\" : %.4f},\"rotation\" : %.4f }",
+		leftpos[0], leftpos[1], leftpos[2], leftpos[3]);
+		if(PrintData){
+			printf_s(buf);
+			printf_s("\n");
+		}
+		if(SendData) sendData(buf);
+		
+		sprintf_s(buf, sizeof(buf), "{ \"direction\":\"Right\",\"position\" : {\"x\":%.4f,\"y\" : %.4f,\"z\" : %.4f},\"rotation\" : %.4f }",
+		rightpos[0], rightpos[1], rightpos[2], rightpos[3]);
+		if(PrintData){
+			printf_s(buf);
+			printf_s("\n");
+		}
+		if(SendData) sendData(buf);
 	}
 	
-	
+	SocketClose();
 	return 0;
 }
