@@ -93,6 +93,7 @@
     <ClInclude Include="Usb4Device.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CASTMain_SendOpt.cpp" />
     <ClCompile Include="FixtureConfigEditor.cpp" />
     <ClCompile Include="Hardware.cpp" />
     <ClCompile Include="jsoncpp.cpp" />

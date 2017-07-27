@@ -5,8 +5,8 @@ CCriticalSection g_csPosition;
 
 CHardware::CHardware()
 {
-	memset(&nodeJs_ExecuteInfo, 0, sizeof(nodeJs_ExecuteInfo));
-	/*initPlatformInfo();*/
+	/*memset(&nodeJs_ExecuteInfo, 0, sizeof(nodeJs_ExecuteInfo));*/
+	initPlatformInfo();
 }
 
 CHardware::~CHardware()
@@ -210,11 +210,11 @@ int CHardware::resetAllEncoderValues(FIXTURE fixture)
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // Fixture calibration
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-int CHardware::genFixConfigJsonFile(MatrixXd curFixParams)
-{
-	cFixtureConfigEditor.genFixConfigJsonFile(gPlatformInfo.folderPath, cFixCalibAlgo.getCurFixture(), curFixParams);
-	return _OK_;
-}
+//int CHardware::genFixConfigJsonFile(MatrixXd curFixParams)
+//{
+//	cFixtureConfigEditor.genFixConfigJsonFile(gPlatformInfo.folderPath, cFixCalibAlgo.getCurFixture(), curFixParams);
+//	return _OK_;
+//}
 //
 //int CHardware::initFixCalibAlgo(HWND curParentDlgHwnd, FIXTURE fixture)
 //{
@@ -306,13 +306,14 @@ int CHardware::loadPositionParams()
 	int iSuccess;
 	// 1. read fixture configuration file
 	MatrixXd fixtureParams;
-	iSuccess = cFixtureConfigEditor.readFixtureParams(gPlatformInfo.folderPath, fixtureParams);
+	/*iSuccess = cFixtureConfigEditor.readFixtureParams(gPlatformInfo.folderPath, fixtureParams);*/
+	iSuccess = cFixtureConfigEditor.readFixtureParams(".\\", fixtureParams);
 	if (iSuccess) return _FAIL_;
 	gFixParams[LEFT] = fixtureParams.row(LEFT);
 	gFixParams[RIGHT] = fixtureParams.row(RIGHT);
 	
 	// 2. read camera configuration file
-	iSuccess = cCameraConfigEditor.readCamMatrix(gPlatformInfo.folderPath, gCamMatrix);
+	//iSuccess = cCameraConfigEditor.readCamMatrix(gPlatformInfo.folderPath, gCamMatrix);
 	return iSuccess;
 }
 
