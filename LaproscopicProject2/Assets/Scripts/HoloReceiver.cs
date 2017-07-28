@@ -86,7 +86,8 @@ public class HoloReceiver : MonoBehaviour
         tableParent.transform.rotation = new Quaternion();
         tableChild = new GameObject("calibratedTableOrigin");
         tableChild.transform.parent = tableParent.transform;
-        Vector3 pos = new Vector3(-0.134f, -0.977f, -0.906f); //origin
+        Vector3 pos = new Vector3(-0.134f, -0.977f, -0.906f); 
+        //origin
                                                               //pos = new Vector3(-0.284f, -0.967f, -1.01f);//point2
                                                               //pos = new Vector3(-0.347f,-0.787f,-1.046f);//point3
                                                               //pos = new Vector3(-0.346f, -0.966f, -0.933f);//point4
@@ -264,7 +265,7 @@ public class HoloReceiver : MonoBehaviour
                 {
                     Vector3 counter_drift_avg = counter_drift_total / 30;
                     meter_position = meter_position + counter_drift_avg;
-                    GameObject.Find("ViveMeter").transform.position = meter_position;
+                    this.transform.parent.Find("ViveMeter").position = meter_position;
                     drift_accum_curr = 0;
                     counter_drift_total = new Vector3(0, 0, 0);
                 }
