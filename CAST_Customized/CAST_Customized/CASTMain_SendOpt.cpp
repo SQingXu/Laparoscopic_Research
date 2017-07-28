@@ -46,7 +46,7 @@ int main()
 
 	char buf[1024];
 	while(true){
-		Sleep(1000);
+		Sleep(50);
 		gHw.updatePosition(RIGHT);
 		VectorXd rightpos = gHw.getPosition(RIGHT);
 		//std::cout << "Right Pos x: " << rightpos[0] << " y: "<< rightpos[1] << " z: " << rightpos[2] << " ori " << rightpos[3] << "\n"; 
@@ -54,7 +54,7 @@ int main()
 		VectorXd leftpos = gHw.getPosition(LEFT);
 		//std::cout << "Left Pos x: " << leftpos[0] << " y: "<< leftpos[1] << " z: " << leftpos[2] << " ori " << leftpos[3] << "\n";
 		sprintf_s(buf, sizeof(buf), "{ \"direction\":\"Left\",\"position\" : {\"x\":%.4f,\"y\" : %.4f,\"z\" : %.4f},\"rotation\" : %.4f }",
-		leftpos[0], leftpos[1], leftpos[2], leftpos[3]);
+		leftpos[0]/100, leftpos[2]/100, leftpos[1]/100, leftpos[3]);
 		if(PrintData){
 			printf_s(buf);
 			printf_s("\n");
@@ -62,7 +62,7 @@ int main()
 		if(SendData) sendData(buf);
 		
 		sprintf_s(buf, sizeof(buf), "{ \"direction\":\"Right\",\"position\" : {\"x\":%.4f,\"y\" : %.4f,\"z\" : %.4f},\"rotation\" : %.4f }",
-		rightpos[0], rightpos[1], rightpos[2], rightpos[3]);
+		rightpos[0]/100, rightpos[2]/100, rightpos[1]/100, rightpos[3]);
 		if(PrintData){
 			printf_s(buf);
 			printf_s("\n");
