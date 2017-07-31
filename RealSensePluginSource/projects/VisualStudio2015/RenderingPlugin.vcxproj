@@ -231,7 +231,7 @@ ENDLOCAL
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(GeneratedFilesDir);$(IntDir);.;include;res;$(RSSDK_DIR)/include;$(RSSDK_DIR)/sample/core/common/include;$(RSSDK_DIR)/sample/core/common/include;C:\Users\xsq4525\Documents\Laproscopic_Research\RealSensePluginSource\projects\CameraViewer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(GeneratedFilesDir);$(IntDir);.;include;res;$(RSSDK_DIR)/include;$(RSSDK_DIR)/sample/core/common/include;$(RSSDK_DIR)/sample/core/common/include;C:\Users\xsq4525\Documents\Laparoscopic_Research\RealSensePluginSource\projects\CameraViewer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;WindowsApp.lib;libpxcmd.lib;libpxcutilsmd.lib;CameraViewer.cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -240,7 +240,7 @@ ENDLOCAL
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <ModuleDefinitionFile>../../source/RenderingPlugin.def</ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>$(RSSDK_DIR)/lib/$(PlatformName);$(RSSDK_DIR)/sample/core/common/lib/$(PlatformName)/$(PlatformToolset);C:\Users\xsq4525\Documents\Laproscopic_Research\RealSensePluginSource\projects\CameraViewer\bin\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(RSSDK_DIR)/lib/$(PlatformName);$(RSSDK_DIR)/sample/core/common/lib/$(PlatformName)/$(PlatformToolset);C:\Users\xsq4525\Documents\Laparoscopic_Research\RealSensePluginSource\projects\CameraViewer\bin\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
     <PostBuildEvent>
