@@ -12,7 +12,10 @@ UnityProject/HoloApp
 *.sdf
 *.db
 *.suo
-*opensdf
+*.opensdf
+*.pbd
+*.ilk
+*.exe
 Debug/
 *.filters
 *.user
