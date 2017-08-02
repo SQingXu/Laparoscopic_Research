@@ -93,6 +93,7 @@
     <Compile Include="Assets\Scripts\Calibration Scripts\PosterDetectorAPI.cs" />
     <Compile Include="Assets\Scripts\Calibration Scripts\WorldPositionFromRays.cs" />
     <Compile Include="Assets\Scripts\Calibration Scripts\ZoneCalibrationManager.cs" />
+    <Compile Include="Assets\Scripts\CameraCalibration.cs" />
     <Compile Include="Assets\Scripts\CastReceiver.cs" />
     <Compile Include="Assets\Scripts\HoloHelper.cs" />
     <Compile Include="Assets\Scripts\HoloReceiver.cs" />

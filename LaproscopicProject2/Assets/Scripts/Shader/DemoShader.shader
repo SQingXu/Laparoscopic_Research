@@ -80,8 +80,8 @@
 				//
 				o.vertex.x = -depth * x;
 				//o.vertex.z = -depth * y;
-				o.vertex.z = depth * y;
-				o.vertex.y = depth;
+				o.vertex.y = depth * y;
+				o.vertex.z = -depth;
 				o.vertex.w = 1.0f;
 
 				
@@ -112,11 +112,11 @@
 				/*float diff1 = vertex1.y - vertex2.y;
 				float diff2 = vertex1.y - vertex3.y;
 				float diff3 = vertex2.y - vertex3.y;*/
-				float diff1 = vertex2.y - vertex1.y;
-				float diff2 = vertex3.y - vertex1.y;
-				float diff3 = vertex3.y - vertex2.y;
+				float diff1 = vertex2.z - vertex1.z;
+				float diff2 = vertex3.z - vertex1.z;
+				float diff3 = vertex3.z - vertex2.z;
 
-				float soglia =  (0.03 + 0.008 * vertex1.y * vertex1.y);
+				float soglia =  (0.03 + 0.008 * vertex1.z * vertex1.z);
 				//float soglia = 0.03;
 
 				//if (vertex1.y > 0 && vertex2.y > 0 && vertex3.y > 0)

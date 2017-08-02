@@ -57,40 +57,40 @@ const char* keys  =
 }
 
 
-int main(int argc, char *argv[]) {
-    /*CommandLineParser parser(argc, argv, keys);
-    parser.about(about);
-
-    if(argc < 4) {
-        parser.printMessage();
-        return 0;
-    }
-
-    int dictionaryId = parser.get<int>("d");
-    int markerId = parser.get<int>("id");
-    int borderBits = parser.get<int>("bb");
-    int markerSize = parser.get<int>("ms");
-    bool showImage = parser.get<bool>("si");
-
-    String out = parser.get<String>(0);
-
-    if(!parser.check()) {
-        parser.printErrors();
-        return 0;
-    }*/
-
-    Ptr<aruco::Dictionary> dictionary =
-        aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
-
-    Mat markerImg;
-    aruco::drawMarker(dictionary, 55, 200, markerImg, 1);
-
-    if(true) {
-        imshow("marker", markerImg);
-        waitKey(0);
-    }
-
-    imwrite("GeneratedMarker3.png", markerImg);
-
-    return 0;
-}
+//int main(int argc, char *argv[]) {
+//    /*CommandLineParser parser(argc, argv, keys);
+//    parser.about(about);
+//
+//    if(argc < 4) {
+//        parser.printMessage();
+//        return 0;
+//    }
+//
+//    int dictionaryId = parser.get<int>("d");
+//    int markerId = parser.get<int>("id");
+//    int borderBits = parser.get<int>("bb");
+//    int markerSize = parser.get<int>("ms");
+//    bool showImage = parser.get<bool>("si");
+//
+//    String out = parser.get<String>(0);
+//
+//    if(!parser.check()) {
+//        parser.printErrors();
+//        return 0;
+//    }*/
+//
+//    Ptr<aruco::Dictionary> dictionary =
+//        aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
+//
+//    Mat markerImg;
+//    aruco::drawMarker(dictionary, 55, 200, markerImg, 1);
+//
+//    if(true) {
+//        imshow("marker", markerImg);
+//        waitKey(0);
+//    }
+//
+//    imwrite("GeneratedMarker3.png", markerImg);
+//
+//    return 0;
+//}
