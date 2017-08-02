@@ -99,8 +99,9 @@ public class CastReceiver : MonoBehaviour
         {
             //Debug.Log(Instance.lastFixtureTipTransform_left.position);
             //Debug.Log(Instance.lastFixtureTipTransform_right.position);
-            this.transform.parent.Find("LeftInstrumentTip").localPosition = Instance.lastFixtureTipTransform_left.position;
-            this.transform.parent.Find("RightInstrumentTip").localPosition = Instance.lastFixtureTipTransform_right.position;
+            //this.transform.parent.Find("LeftInstrumentTip").localPosition = Instance.lastFixtureTipTransform_left.position;
+            //this.transform.parent.Find("RightInstrumentTip").localPosition = Instance.lastFixtureTipTransform_right.position;
+
             leftInstruTipTransf.localPosition = Instance.lastFixtureTipTransform_left.position;
             rightInstruTipTransf.localPosition = Instance.lastFixtureTipTransform_right.position;
 
@@ -129,6 +130,10 @@ public class CastReceiver : MonoBehaviour
         //move instrument along z axis with the value
         GameObject.Find("LeftInstrument").transform.localPosition = new Vector3(0, 0, left);
         GameObject.Find("RightInstrument").transform.localPosition = new Vector3(0, 0, right);
+        GameObject.Find("LeftInstrumentTip").transform.localPosition = new Vector3(0, 0, left + (leftInstruLength / 2));
+        GameObject.Find("RightInstrumentTip").transform.localPosition = new Vector3(0, 0, right + (rightInstruLength / 2));
+        GameObject.Find("LeftInstrumentTip").transform.localRotation = Quaternion.Euler(0,0,-Instance.lastFixtureTipTransform_left.rotation);
+        GameObject.Find("RightInstrumentTip").transform.localRotation = Quaternion.Euler(0, 0, -Instance.lastFixtureTipTransform_right.rotation);
         leftTip_norot.transform.localPosition = new Vector3(0, 0, left + (leftInstruLength / 2));
         rightTip_norot.transform.localPosition = new Vector3(0, 0, right + (rightInstruLength / 2));
 
