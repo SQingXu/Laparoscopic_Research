@@ -39,6 +39,20 @@ public class FixtureTipTransform
 public class CastReceiver : MonoBehaviour
 {
     private CASTClient Instance { get; set; }
+    private GameObject leftInstruTip;
+    private GameObject rightInstruTip;
+    private GameObject leftTip_norot;
+    private GameObject rightTip_norot;
+    private GameObject leftTip_rot;
+    private GameObject rightTip_rot;
+    private GameObject parentdup_left;
+    private GameObject parentdup_right;
+    private Transform leftInstruTipTransf;
+    private Transform rightInstruTipTransf;
+    private Transform leftInstruPivotTransf;
+    private Transform rightInstruPivotTransf;
+    private float leftInstruLength;
+    private float rightInstruLength;
 
     public int port = 8500;
     void Start()
@@ -46,7 +60,36 @@ public class CastReceiver : MonoBehaviour
         this.Instance = this.gameObject.AddComponent<CASTClient>();
         this.Instance.Init(port);
         Debug.Log("CAST UDP receiver start");
+        leftInstruTip = new GameObject("LeftInsturTip");
+        rightInstruTip = new GameObject("RightInstruTip");
+        leftInstruTipTransf = leftInstruTip.transform;
+        rightInstruTipTransf = rightInstruTip.transform;
+        leftInstruTipTransf.parent = GameObject.Find("Origin").transform;
+        rightInstruTipTransf.parent = GameObject.Find("Origin").transform;
 
+        leftInstruPivotTransf = GameObject.Find("LeftInstrumentParent").transform;
+        rightInstruPivotTransf = GameObject.Find("RightInstrumentParent").transform;
+        leftInstruLength = GameObject.Find("LeftInstrument").transform.localScale.y * 2; //cylinder's total length is twice what the y is
+        rightInstruLength = GameObject.Find("RightInstrument").transform.localScale.y * 2;
+
+        parentdup_left = new GameObject("LeftInstrumentDuplicate");
+        parentdup_right = new GameObject("RightInstrumentDuplicate");
+        parentdup_left.transform.parent = GameObject.Find("Origin").transform;
+        parentdup_right.transform.parent = GameObject.Find("Origin").transform;
+        parentdup_left.transform.localPosition = leftInstruPivotTransf.localPosition;
+        parentdup_left.transform.localRotation = new Quaternion();
+        parentdup_right.transform.localPosition = rightInstruPivotTransf.localPosition;
+        parentdup_right.transform.localRotation = new Quaternion();
+
+        leftTip_norot = new GameObject("LeftInstruTipWithoutRot");
+        rightTip_norot = new GameObject("RightInstruTipWithoutRot");
+        leftTip_norot.transform.parent = parentdup_left.transform;
+        rightTip_norot.transform.parent = parentdup_right.transform;
+
+        leftTip_rot = new GameObject("LeftInstruTipWithRot");
+        rightTip_rot = new GameObject("RightInstruTipWithRot");
+        leftTip_rot.transform.parent = parentdup_left.transform;
+        rightTip_rot.transform.parent = parentdup_right.transform;
     }
 
     // Update is called once per frame
@@ -58,19 +101,84 @@ public class CastReceiver : MonoBehaviour
             //Debug.Log(Instance.lastFixtureTipTransform_right.position);
             this.transform.parent.Find("LeftInstrumentTip").localPosition = Instance.lastFixtureTipTransform_left.position;
             this.transform.parent.Find("RightInstrumentTip").localPosition = Instance.lastFixtureTipTransform_right.position;
+            leftInstruTipTransf.localPosition = Instance.lastFixtureTipTransform_left.position;
+            rightInstruTipTransf.localPosition = Instance.lastFixtureTipTransform_right.position;
+
+            //calculate the length between pivot and tip
+            Vector3 pivotTotip_left = leftInstruTipTransf.localPosition - leftInstruPivotTransf.localPosition;
+            Vector3 pivotTotip_right = rightInstruTipTransf.localPosition - rightInstruPivotTransf.localPosition;
+            float length_left = pivotTotip_left.magnitude;
+            float length_right = pivotTotip_right.magnitude;
+            float insertLength_left = length_left - (leftInstruLength/2);
+            float insertlength_right = length_right - (rightInstruLength/2);
+            this.insertPosition(insertLength_left, insertlength_right);
+
+            //calculate rotation
+            leftTip_rot.transform.position = leftInstruTipTransf.position;
+            rightTip_rot.transform.position = rightInstruTipTransf.position;
+            Quaternion rot_left = Quaternion.FromToRotation(leftTip_norot.transform.localPosition, leftTip_rot.transform.localPosition);
+            Quaternion rot_right = Quaternion.FromToRotation(rightTip_norot.transform.localPosition, rightTip_rot.transform.localPosition);
+            GameObject.Find("LeftInstrumentParent").transform.localRotation = rot_left;
+            GameObject.Find("RightInstrumentParent").transform.localRotation = rot_right;
+            this.Instance.ReceiveDataLeft = false;
+            this.Instance.ReceiveDataRight = false;
         }
     }
+    void insertPosition(float left, float right)
+    {
+        //move instrument along z axis with the value
+        GameObject.Find("LeftInstrument").transform.localPosition = new Vector3(0, 0, left);
+        GameObject.Find("RightInstrument").transform.localPosition = new Vector3(0, 0, right);
+        leftTip_norot.transform.localPosition = new Vector3(0, 0, left + (leftInstruLength / 2));
+        rightTip_norot.transform.localPosition = new Vector3(0, 0, right + (rightInstruLength / 2));
 
+    }
 
     class CASTClient : MonoBehaviour
     {
         private int port = 8500;
         private FixtureTipTransform _lastFixtureTipTransform_left;
         private FixtureTipTransform _lastFixtureTipTransform_right;
-        public bool ReceiveDataLeft = false;
-        public bool ReceiveDataRight = false;
+        private bool _ReceiveDataLeft = false;
+        private bool _ReceiveDataRight = false;
         private object lock_left = new object();
         private object lock_right = new object();
+        private object lock_receive_left = new object();
+        private object lock_receive_right = new object();
+        public bool ReceiveDataLeft
+        {
+            get
+            {
+                lock (lock_receive_left)
+                {
+                    return _ReceiveDataLeft;
+                }
+            }
+            set
+            {
+                lock (lock_receive_left)
+                {
+                    _ReceiveDataLeft = value;
+                }
+            }
+        }
+        public bool ReceiveDataRight
+        {
+            get
+            {
+                lock (lock_receive_right)
+                {
+                    return _ReceiveDataRight;
+                }
+            }
+            set
+            {
+                lock (lock_receive_right)
+                {
+                    _ReceiveDataRight = value;
+                }
+            }
+        }
         public FixtureTipTransform lastFixtureTipTransform_left
         {
             get
@@ -197,13 +305,19 @@ public class CastReceiver : MonoBehaviour
             FixtureTipTransform ft = JsonUtility.FromJson<FixtureTipTransform>(msg);
             if (ft.direction.Equals("Left"))
             {
-                ReceiveDataLeft = true;
+                if (!ReceiveDataLeft)
+                {
+                    ReceiveDataLeft = true;
+                }
                 lastFixtureTipTransform_left = ft;
                 //Debug.Log("Left match");
             }
             if (ft.direction.Equals("Right"))
             {
-                ReceiveDataRight = true;
+                if (!ReceiveDataRight)
+                {
+                    ReceiveDataRight = true;
+                }
                 lastFixtureTipTransform_right = ft;
                 //Debug.Log("Right match");
             }
