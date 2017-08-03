@@ -2,8 +2,9 @@
 
 using namespace cv;
 using namespace std;
+
 int LoadImage(Mat* loadImage) {
-	*loadImage = imread("../../CameraCalibration/Images/ArucoM_test05.bmp", CV_LOAD_IMAGE_COLOR);
+	*loadImage = imread("RSCapture_1.bmp", CV_LOAD_IMAGE_COLOR);
 	if (!loadImage->data) {
 		cout << "Could not find or open the image\n";
 		return -1;
@@ -29,24 +30,21 @@ int aruco_detect() {
 	Ptr<aruco::Dictionary> dictionary = aruco::getPredefinedDictionary(aruco::DICT_6X6_250);
 	Mat flipped;
 	cv::flip(*img, flipped, 1);
-	//namedWindow("Display window", WINDOW_AUTOSIZE);// Create a window for display.
-	//imshow("Display window", flipped);                   // Show our image inside it.
-	//waitKey(0);                                          // Wait for a keystroke in the window
 	aruco::detectMarkers(flipped, dictionary, markerCorners, markerIds);
 
 	Mat* outputImage = new Mat();
 	std::cout << markerIds[0] << std::endl;
-	if (markerIds.size() > 0) {
+	/*if (markerIds.size() > 0) {
 		aruco::drawDetectedMarkers(flipped, markerCorners, markerIds);
-	}
-	else {
-		cout << "No marker detected\n";
+	}*/
+	if(markerIds.size() <= 0) {
+		//cout << "No marker detected\n";
 		return -1;
 	}
 	Mat camera_matrix, distort_coeff;
 	readCamCalibFile(&camera_matrix, &distort_coeff);
 	if (!camera_matrix.data || !distort_coeff.data) {
-		cout << "matrix not valid\n";
+		//cout << "matrix not valid\n";
 		return -1;
 	}
 	vector<Vec3d> rot_vecs, tranl_vecs;
@@ -58,20 +56,22 @@ int aruco_detect() {
 	cv::Rodrigues(rot_matrix, rotation_vec);
 	translate_vec = -rot_matrix * Mat(tranl_vecs[0]);
 
-	cout << "Rotation Vector: " << rot_matrix << endl;
-	cout << "Translation Vector: " << translate_vec << endl;
-	FileStorage fs("cam_aruco_calib.json", FileStorage::WRITE);
+	//cout << "Rotation Vector: " << rot_matrix << endl;
+	//cout << "Translation Vector: " << translate_vec << endl;
 	
-	fs << "up_column" << "{" << "x"<< rot_matrix.at<double>(0,1) << "y" << rot_matrix.at<double>(1,1) << "z" << rot_matrix.at<double>(2,1) << "}";
+	//rot[0] = rot_matrix.at<double>(0, 0);
+	//rot[1] = rot_matrix.at<double>(1, 0);
+	FileStorage fs("cam_aruco_calib.json", FileStorage::WRITE);
+
+	fs << "up_column" << "{" << "x" << rot_matrix.at<double>(0, 1) << "y" << rot_matrix.at<double>(1, 1) << "z" << rot_matrix.at<double>(2, 1) << "}";
 	fs << "forward_column" << "{" << "x" << rot_matrix.at<double>(0, 2) << "y" << rot_matrix.at<double>(1, 2) << "z" << rot_matrix.at<double>(2, 2) << "}";
 	fs << "translation_vector" << "{" << "x" << translate_vec.at<double>(0, 0) << "y" << translate_vec.at<double>(0, 1) << "z" << translate_vec.at<double>(0, 2) << "}";
 	fs.release();
+
 	cv::aruco::drawAxis(flipped, camera_matrix, distort_coeff, rot_vecs, tranl_vecs, 0.1);
 	namedWindow("Display window", WINDOW_AUTOSIZE);// Create a window for display.
 	imshow("Display window", flipped);                   // Show our image inside it.
 	waitKey(0);
-}
-int main(int argc, char* argv[]) {
-	return aruco_detect();
+	return 2;
 }
 

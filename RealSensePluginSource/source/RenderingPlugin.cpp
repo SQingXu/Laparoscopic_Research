@@ -3,6 +3,7 @@
 #include "PlatformBase.h"
 #include "RenderAPI.h"
 #include "camera_viewer.h"
+#include "aruco_detection.h"
 
 #include <assert.h>
 #include <math.h>
@@ -47,14 +48,11 @@ static int   g_RGBTextureHeight = 0;
 static void* g_DepthTextureHandle = NULL;
 static int   g_DepthTextureWidth = 0;
 static int   g_DepthTextureHeight = 0;
-
+static void*  aruco_result = NULL;
 static bool g_bFileLoaded = false;
 static IStream* g_pFileStreamData = nullptr;
 
 
-int main() {
-	printOne();
-}
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API Play();
 
 // --------------------------------------------------------------------------
@@ -102,6 +100,21 @@ extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API SetDepthTextureFromUn
 	g_DepthTextureHeight = h;
 
 	//texdata = new unsigned char[w * h * 4];
+}
+
+extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API detectArucoMarker() {
+	int res_temp = aruco_detect();
+	/*std::string str = std::to_string(res_temp);
+	char const* char_ptr = str.c_str();
+	char char_array[4];
+	strcpy(char_array, char_ptr);
+	void* res_ptr = char_array;
+	if (s_CurrentAPI == NULL) {
+	return;
+	}
+	s_CurrentAPI->EndModifyTexture(aruco_result, 1, 1, 4, res_ptr);
+	delete char_array;*/
+	return;
 }
 
 //extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetVideoProperties(int* width, int* height, float* fps)
@@ -383,7 +396,7 @@ static void DrawColoredTriangle()
 //	s_CurrentAPI->EndModifyTexture(textureHandle, width, height, textureRowPitch, textureDataPtr);
 //}
 
-static void ModifyVideoTexturePixels()
+static void ModifyVideoTexturePixels(bool capture)
 {
 	//void* textureHandle = g_TextureHandle;
 	int width_rgb = g_RGBTextureWidth;
@@ -402,9 +415,13 @@ static void ModifyVideoTexturePixels()
 	/*void* textureDataPtr = (unsigned char*)texdata;*/
 	void* textureDataPtrColor = new unsigned char[width_rgb * height_rgb * 4];
 	void* textureDataPtrDepth = new unsigned char[width_depth * height_depth * 2];
+	if (!capture) {
+		acquireOneFrame(textureDataPtrColor, textureDataPtrDepth);
+	}
+	else {
+		acquireOneFrame_capture(textureDataPtrColor, textureDataPtrDepth);
+	}
 	
-	acquireOneFrame(textureDataPtrColor, textureDataPtrDepth);
-
 
 	if (!textureDataPtrDepth || !textureDataPtrColor)
 		return;
@@ -416,6 +433,8 @@ static void ModifyVideoTexturePixels()
 	delete textureDataPtrColor;
 	delete textureDataPtrDepth;
 }
+
+
 
 static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
 {
@@ -430,17 +449,38 @@ static void UNITY_INTERFACE_API OnRenderEvent(int eventID)
 
 	//DrawColoredTriangle();
 	//ModifyTexturePixels();
-	ModifyVideoTexturePixels();
+	ModifyVideoTexturePixels(false);
+}
+
+static void UNITY_INTERFACE_API OnRenderEvent_capture(int eventID)
+{
+	//	DebugInUnity("OnRenderEvent");
+	//std::cout << "OnRenderEvent " << eventID << std::endl;
+	//return;
+	// Unknown / unsupported graphics device type? Do nothing
+	if (s_CurrentAPI == NULL)
+		return;
+	if (g_RGBTextureHandle == NULL || g_DepthTextureHandle == NULL)
+		return;
+
+	//DrawColoredTriangle();
+	//ModifyTexturePixels();
+	ModifyVideoTexturePixels(true);
 }
 
 
 // --------------------------------------------------------------------------
 // GetRenderEventFunc, an example function we export which is used to get a rendering event callback function.
+extern "C" UnityRenderingEvent UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetRenderEventFunc_Capture()
+{
+	return OnRenderEvent_capture;
+}
 
 extern "C" UnityRenderingEvent UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API GetRenderEventFunc()
 {
 	return OnRenderEvent;
 }
+
 
 extern "C" void UNITY_INTERFACE_EXPORT UNITY_INTERFACE_API ExitAndDestroy()
 {

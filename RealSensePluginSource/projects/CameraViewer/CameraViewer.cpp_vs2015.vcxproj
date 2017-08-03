@@ -184,7 +184,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.;include;res;$(RSSDK_DIR)/include;$(RSSDK_DIR)/sample/core/common/include;$(RSSDK_DIR)/sample/core/common/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;include;res;$(RSSDK_DIR)/include;$(RSSDK_DIR)/sample/core/common/include;$(OPENCV_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN64;NDEBUG;_CONSOLE;_WIN64_WINNT=0x0602;;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -214,10 +214,12 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\aruco_detection.cpp" />
     <ClCompile Include="Src\camera_viewer.cpp" />
     <ClCompile Include="src\yuv2rgb.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="aruco_detection.h" />
     <ClInclude Include="camera_viewer.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\yuv2rgb.h" />

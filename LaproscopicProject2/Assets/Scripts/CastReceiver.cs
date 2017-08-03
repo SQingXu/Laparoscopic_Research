@@ -15,7 +15,7 @@ using System;
 using System.Text;
 using System.IO;
 
-//[Serializable]
+[Serializable]
 
 public class FixtureTipTransform
 {

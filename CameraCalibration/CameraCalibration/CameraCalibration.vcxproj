@@ -147,13 +147,17 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>opencv_world320.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opencv_calib3d330.lib;opencv_aruco330.lib;opencv_core330.lib;opencv_features2d330.lib;opencv_flann330.lib;opencv_highgui330.lib;opencv_imgproc330.lib;opencv_imgcodecs330.lib;opencv_ml330.lib;opencv_objdetect330.lib;opencv_photo330.lib;opencv_stitching330.lib;opencv_superres330.lib;opencv_ts330.lib;opencv_video330.lib;opencv_videoio330.lib;opencv_videostab330.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OPENCV_DIR)\lib\Release</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="aruco_detection.cpp" />
     <ClCompile Include="camera_calibration.cpp" />
     <ClCompile Include="create_marker.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="aruco_detection.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
