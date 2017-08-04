@@ -1,7 +1,8 @@
 LaproscopicProject2/Temp/
 LaproscopicProject2/HoloApp
 LaproscopicProject2/Library/
-
+LaproscopicProject2/RSCapture_1.bmp
+LaproscopicProject2/cam_aruco_calib.json
 
 UnityProject/Library/
 UnityProject/Temp/
@@ -30,6 +31,7 @@ RealSensePluginSource/projects/UWPVisualStudio2015/Release/
 RealSensePluginSource/projects/UWPVisualStudio2015/Win32Project1/Release/
 RealSensePluginSource/projects/UWPVisualStudio2015/Win32Project1/x64/
 RealSensePluginSource/projects/UWPVisualStudio2015/x64/
+RealSensePluginSource/projects/CameraViewer/build/x64_Release/CameraViewer.cpp/
 CAST_Customized/Debug/
 CAST_Customized/Release/
 CAST_Customized/ipch/

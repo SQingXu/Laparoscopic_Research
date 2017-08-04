@@ -33,14 +33,11 @@ int aruco_detect() {
 	aruco::detectMarkers(flipped, dictionary, markerCorners, markerIds);
 
 	Mat* outputImage = new Mat();
-	std::cout << markerIds[0] << std::endl;
-	/*if (markerIds.size() > 0) {
-		aruco::drawDetectedMarkers(flipped, markerCorners, markerIds);
-	}*/
 	if(markerIds.size() <= 0) {
 		//cout << "No marker detected\n";
 		return -1;
 	}
+	aruco::drawDetectedMarkers(flipped, markerCorners, markerIds);
 	Mat camera_matrix, distort_coeff;
 	readCamCalibFile(&camera_matrix, &distort_coeff);
 	if (!camera_matrix.data || !distort_coeff.data) {
