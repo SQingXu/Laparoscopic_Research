@@ -112,7 +112,8 @@ public class HoloReceiver : MonoBehaviour
 
         counter_drift_total = new Vector3(0, 0, 0);
         drift_accum_curr = 0;
-       Debug.Log("HoloReceiver Started");
+        camera_rot = new Quaternion(0, 0, 0, 1);
+        //Debug.Log("HoloReceiver Started");
         // this.enabled = false;
     }
     Vector3 rotateAroundAxis(Vector3 point, Vector3 pivot, Quaternion quat)
@@ -141,7 +142,7 @@ public class HoloReceiver : MonoBehaviour
             this.CalibrateRotation();
             Debug.Log("H pressed");
         }
-        if(Input.GetKeyDown(KeyCode.A) && !calibrating)
+        if(Input.GetKeyDown(KeyCode.S) && !calibrating)
         {
             Debug.Log("Confirm calibration of table, store the position and orientation of table");
             this.StoreTableCalibration();
@@ -352,22 +353,6 @@ public class HoloReceiver : MonoBehaviour
         storedTableRot = storedTable.transform.localRotation;
         calib_confirmed = true;
     }
-    //void LateUpdate()
-    //{
-    //    //Camera.main.transform.Rotate(new Vector3(0.01f, 0f, 0f));
-    //    Debug.Log("LateUpdate");
-    //    if (Instance.bTT)
-    //    {
-    //        //
-    //        Debug.Log("Applying Tracker LateUpdate " + Instance.lastTrackerTransform.position.ToString());
-    //        this.transform.position = Instance.lastTrackerTransform.position;
-    //        this.transform.rotation = Instance.lastTrackerTransform.rotation;
-    //        //Camera.main.transform.position = Instance.lastTrackerTransform.position;
-    //        //Camera.main.transform.rotation = Instance.lastTrackerTransform.rotation;
-
-
-    //    }
-    //}
 
     class HoloClient : MonoBehaviour
     {
