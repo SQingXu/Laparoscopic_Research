@@ -128,7 +128,7 @@ public class CastReceiver : MonoBehaviour
     void insertPosition(float left, float right)
     {
         //move instrument along z axis with the value
-        GameObject.Find("LeftInstrument").transform.localPosition = new Vector3(0, 0, left);
+        GameObject.Find("LeftInstrument").transform.localPosition = new Vector3(0, 0, left-0.02f);
         GameObject.Find("RightInstrument").transform.localPosition = new Vector3(0, 0, right);
         GameObject.Find("LeftInstrumentTip").transform.localPosition = new Vector3(0, 0, left + (leftInstruLength / 2));
         GameObject.Find("RightInstrumentTip").transform.localPosition = new Vector3(0, 0, right + (rightInstruLength / 2));
