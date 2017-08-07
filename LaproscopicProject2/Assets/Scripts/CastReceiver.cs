@@ -69,9 +69,11 @@ public class CastReceiver : MonoBehaviour
 
         leftInstruPivotTransf = GameObject.Find("LeftInstrumentParent").transform;
         rightInstruPivotTransf = GameObject.Find("RightInstrumentParent").transform;
-        leftInstruLength = GameObject.Find("LeftInstrument").transform.localScale.y * 2; //cylinder's total length is twice what the y is
-        rightInstruLength = GameObject.Find("RightInstrument").transform.localScale.y * 2;
-
+        //leftInstruLength = GameObject.Find("LeftInstrument").transform.localScale.y * 2; //cylinder's total length is twice what the y is
+        //rightInstruLength = GameObject.Find("RightInstrument").transform.localScale.y * 2;
+        leftInstruLength = 0.0378f;
+        rightInstruLength = 0.019f;
+        
         parentdup_left = new GameObject("LeftInstrumentDuplicate");
         parentdup_right = new GameObject("RightInstrumentDuplicate");
         parentdup_left.transform.parent = GameObject.Find("Origin").transform;
@@ -110,8 +112,8 @@ public class CastReceiver : MonoBehaviour
             Vector3 pivotTotip_right = rightInstruTipTransf.localPosition - rightInstruPivotTransf.localPosition;
             float length_left = pivotTotip_left.magnitude;
             float length_right = pivotTotip_right.magnitude;
-            float insertLength_left = length_left - (leftInstruLength/2);
-            float insertlength_right = length_right - (rightInstruLength/2);
+            float insertLength_left = length_left - (leftInstruLength);
+            float insertlength_right = length_right - (rightInstruLength);
             this.insertPosition(insertLength_left, insertlength_right);
 
             //calculate rotation
@@ -120,7 +122,9 @@ public class CastReceiver : MonoBehaviour
             Quaternion rot_left = Quaternion.FromToRotation(leftTip_norot.transform.localPosition, leftTip_rot.transform.localPosition);
             Quaternion rot_right = Quaternion.FromToRotation(rightTip_norot.transform.localPosition, rightTip_rot.transform.localPosition);
             GameObject.Find("LeftInstrumentParent").transform.localRotation = rot_left;
+            GameObject.Find("LeftInstrumentParent").transform.Rotate(new Vector3(0, 0, -Instance.lastFixtureTipTransform_left.rotation), Space.Self);
             GameObject.Find("RightInstrumentParent").transform.localRotation = rot_right;
+            GameObject.Find("RightInstrumentParent").transform.Rotate(new Vector3(0, 0, -Instance.lastFixtureTipTransform_right.rotation), Space.Self);
             this.Instance.ReceiveDataLeft = false;
             this.Instance.ReceiveDataRight = false;
         }
@@ -128,12 +132,14 @@ public class CastReceiver : MonoBehaviour
     void insertPosition(float left, float right)
     {
         //move instrument along z axis with the value
-        GameObject.Find("LeftInstrument").transform.localPosition = new Vector3(0, 0, left-0.02f);
-        GameObject.Find("RightInstrument").transform.localPosition = new Vector3(0, 0, right);
-        GameObject.Find("LeftInstrumentTip").transform.localPosition = new Vector3(0, 0, left + (leftInstruLength / 2));
-        GameObject.Find("RightInstrumentTip").transform.localPosition = new Vector3(0, 0, right + (rightInstruLength / 2));
-        GameObject.Find("LeftInstrumentTip").transform.localRotation = Quaternion.Euler(0,0,-Instance.lastFixtureTipTransform_left.rotation);
-        GameObject.Find("RightInstrumentTip").transform.localRotation = Quaternion.Euler(0, 0, -Instance.lastFixtureTipTransform_right.rotation);
+        //GameObject.Find("LeftInstrument").transform.localPosition = new Vector3(0, 0, left-0.02f);
+        GameObject.Find("laparo_grasper").transform.localPosition = new Vector3(0, 0, left);
+        GameObject.Find("laparo_scissors").transform.localPosition = new Vector3(0, 0, right);
+        //GameObject.Find("RightInstrument").transform.localPosition = new Vector3(0, 0, right);
+        //GameObject.Find("LeftInstrumentTip").transform.localPosition = new Vector3(0, 0, left + leftInstruLength);
+        //GameObject.Find("RightInstrumentTip").transform.localPosition = new Vector3(0, 0, right + (rightInstruLength / 2));
+        //GameObject.Find("LeftInstrumentTip").transform.localRotation = Quaternion.Euler(0,0,-Instance.lastFixtureTipTransform_left.rotation);
+        //GameObject.Find("RightInstrumentTip").transform.localRotation = Quaternion.Euler(0, 0, -Instance.lastFixtureTipTransform_right.rotation);
         leftTip_norot.transform.localPosition = new Vector3(0, 0, left + (leftInstruLength / 2));
         rightTip_norot.transform.localPosition = new Vector3(0, 0, right + (rightInstruLength / 2));
 
