@@ -31,6 +31,19 @@ public class TrackerTransform
         cam_rotation = new Quaternion();
     }
 }
+[Serializable]
+public class StoredTransform
+{
+    //relative to Vive meter 
+    public Vector3 StoredPosition;
+    public Quaternion StoredRotation;
+    public StoredTransform(Vector3 v, Quaternion q)
+    {
+        this.StoredPosition = v;
+        this.StoredRotation = q;
+    } 
+
+}
 
 public class HoloReceiver : MonoBehaviour
 {
@@ -44,6 +57,7 @@ public class HoloReceiver : MonoBehaviour
     [Range(0f, 100.0f)]
     public float output_rate;// = 0.2f;
     public int driftadjust_rate = 10;
+    public string filename = "StoredTable.json";
     private Quaternion from0toTable;
     Quaternion re_from0toTable;
     private Vector3 meter_position;
@@ -86,15 +100,16 @@ public class HoloReceiver : MonoBehaviour
         tableParent.transform.rotation = new Quaternion();
         tableChild = new GameObject("calibratedTableOrigin");
         tableChild.transform.parent = tableParent.transform;
+        storedTable = new GameObject("StoredTableRelativeToViveMeter");
+        storedTable.transform.parent = this.transform.parent.Find("ViveMeter");
         Vector3 pos = new Vector3(-0.134f, -0.977f, -0.906f); 
         //origin
-                                                              //pos = new Vector3(-0.284f, -0.967f, -1.01f);//point2
-                                                              //pos = new Vector3(-0.347f,-0.787f,-1.046f);//point3
-                                                              //pos = new Vector3(-0.346f, -0.966f, -0.933f);//point4
-                                                              //pos = new Vector3(-0.545f, -0.962f, -0.676f);//point5
-                                                              //Vector3 pos2 = this.rotateAroundAxis(pos, new Vector3(0, 0, 0), pointQuat);
-                                                              //Debug.Log("pos2 x: " + pos2.x + " y: " + pos2.y + " z: " + pos2.z);
-
+        //pos = new Vector3(-0.284f, -0.967f, -1.01f);//point2
+        //pos = new Vector3(-0.347f,-0.787f,-1.046f);//point3
+        //pos = new Vector3(-0.346f, -0.966f, -0.933f);//point4
+        //pos = new Vector3(-0.545f, -0.962f, -0.676f);//point5
+        //Vector3 pos2 = this.rotateAroundAxis(pos, new Vector3(0, 0, 0), pointQuat);
+        //Debug.Log("pos2 x: " + pos2.x + " y: " + pos2.y + " z: " + pos2.z);
 
         //Vector3 mid_pos = this.rotateAroundAxis(pos, new Vector3(0, 0, 0), re_from0toTable);
         //Vector3 final_pos = new Vector3(mid_pos.x, mid_pos.z, -mid_pos.y);
@@ -146,6 +161,11 @@ public class HoloReceiver : MonoBehaviour
         {
             Debug.Log("Confirm calibration of table, store the position and orientation of table");
             this.StoreTableCalibration();
+        }
+        if(Input.GetKeyDown(KeyCode.L) && !calibrating)
+        {
+            Debug.Log("Load calibration data from previous one");
+            this.LoadTableCalibration();
         }
 
         //if (Instance.bTT_1 && !calibrating)
@@ -234,6 +254,10 @@ public class HoloReceiver : MonoBehaviour
             calibratedCam.transform.position = TT0.cam_position;
             calibratedCam.transform.rotation = TT0.cam_rotation;
 
+            //set meter rotation
+            Quaternion meter_converted_rot = new Quaternion(-m_rot.x, m_rot.y, m_rot.z, -m_rot.w);
+            this.transform.parent.Find("ViveMeter").transform.rotation = meter_converted_rot;
+
             //set meter position relative to Hololens
             Quaternion re_m_rot = Quaternion.Inverse(m_rot);
             Vector3 mid_pos = this.rotateAroundAxis(m_pos_raw, new Vector3(0, 0, 0), re_m_rot);
@@ -316,7 +340,7 @@ public class HoloReceiver : MonoBehaviour
             calib_confirmed = false;
             tableParent.transform.position = this.transform.position;
             tableParent.transform.rotation = this.transform.rotation;
-            Vector3 tableCalib = new Vector3(0, -0.158f, 0);
+            Vector3 tableCalib = new Vector3(0, -0.155f, 0);
             tableChild.transform.localPosition = new Vector3(0,0,0);
             tableChild.transform.localPosition = tableChild.transform.localPosition + tableCalib;
             this.transform.parent.Find("Origin").rotation = this.transform.rotation;
@@ -347,14 +371,36 @@ public class HoloReceiver : MonoBehaviour
     public void StoreTableCalibration()
     {
         //set storedTable as child of ViveMeter object to stable local position and rotation of Table relative to ViveMeter;
-        storedTable = new GameObject();
         storedTable.transform.position = this.transform.parent.Find("Origin").position;
         storedTable.transform.rotation = this.transform.parent.Find("Origin").rotation;
-        storedTable.transform.parent = this.transform.parent.Find("ViveMeter");
+        
         storedTablePos = storedTable.transform.localPosition;
         storedTableRot = storedTable.transform.localRotation;
+        StoredTransform storedT = new StoredTransform(storedTablePos, storedTableRot);
+        String jsonStored = JsonUtility.ToJson(storedT);
+        String filePath = Path.Combine(Application.streamingAssetsPath, filename);
+        File.WriteAllText(filePath, jsonStored);
         calib_confirmed = true;
     }
+
+    public void LoadTableCalibration()
+    {
+        String filePath = Path.Combine(Application.streamingAssetsPath, filename);
+        if (File.Exists(filePath))
+        {
+            StreamReader reader = new StreamReader(filePath);
+            string jsonString = reader.ReadToEnd();
+            reader.Close();
+            StoredTransform storedT = JsonUtility.FromJson<StoredTransform>(jsonString);
+            storedTablePos = storedT.StoredPosition;
+            storedTableRot = storedT.StoredRotation;
+            calib_confirmed = true;
+        }
+        else
+        {
+            Debug.Log("Calibration storation json file does not exist.");
+        }
+    } 
 
     class HoloClient : MonoBehaviour
     {
