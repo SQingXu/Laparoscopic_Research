@@ -49,8 +49,8 @@ public class ArduinoReceiver : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         //setting variable
-        r_g_min = 32000.0f;
-        r_g_max = 16800.0f;
+        r_g_min = 33000.0f;
+        r_g_max = 18000.0f;
         d_g_max = 0.02753f/2.0f;
         i_g = (d_g_max) / (r_g_max - r_g_min);
 
@@ -85,7 +85,7 @@ public class ArduinoReceiver : MonoBehaviour {
     }
     // Update is called once per frame
     void Update () {
-        //Debug.Log("R_g: " + reading.R_g + " R_s: " + reading.R_s);
+        Debug.Log("R_g: " + reading.R_g + " R_s: " + reading.R_s);
         CalculateRotation(reading);
     }
 
