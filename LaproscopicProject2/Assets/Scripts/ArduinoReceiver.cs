@@ -85,7 +85,7 @@ public class ArduinoReceiver : MonoBehaviour {
     }
     // Update is called once per frame
     void Update () {
-        Debug.Log("R_g: " + reading.R_g + " R_s: " + reading.R_s);
+        //Debug.Log("R_g: " + reading.R_g + " R_s: " + reading.R_s);
         CalculateRotation(reading);
     }
 

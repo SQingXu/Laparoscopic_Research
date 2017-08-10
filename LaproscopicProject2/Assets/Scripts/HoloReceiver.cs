@@ -269,101 +269,17 @@ public class HoloReceiver : MonoBehaviour
             }
         }
 
-        if (Instance.bTT_0 && Instance.bTT_1 && !calibrating)
+        if (Instance.bTT_1 && !calibrating)
         {
-            //TrackerTransform TT0 = Instance.lastTrackerTransform_0;
-            //TrackerTransform TT1 = Instance.lastTrackerTransform_1;
-            //Vector3 stablePosCalib = new Vector3(0, 0.1f, 0.02f);
-            ////meter raw data
-            //Vector3 m_pos_raw = TT0.position;
-            //Quaternion m_rot = TT0.rotation;
-            ////tracker2 raw data
-            //Vector3 t_pos_raw = TT1.position;
-            //Quaternion t_rot = TT1.rotation;
-            ////set camera position
-            //calibratedCam.transform.position = TT0.cam_position;
-            //calibratedCam.transform.rotation = TT0.cam_rotation;
-
-            ////set meter rotation
-            //Quaternion meter_converted_rot = new Quaternion(-m_rot.x, m_rot.y, m_rot.z, -m_rot.w);
-            //this.transform.parent.Find("ViveMeter").transform.rotation = meter_converted_rot;
-
-            ////set meter position relative to Hololens
-            //Quaternion re_m_rot = Quaternion.Inverse(m_rot);
-            //Vector3 mid_pos = this.rotateAroundAxis(m_pos_raw, new Vector3(0, 0, 0), re_m_rot);
-
-            //if (calib_confirmed)
-            //{
-            //    Vector3 m_final_pos = new Vector3(mid_pos.x, mid_pos.z, -mid_pos.y);
-            //    Transform localToCamera = Camera.main.transform.Find("TrackerLocalToCamera");
-            //    localToCamera.localPosition = m_final_pos + stablePosCalib;
-            //    meter_position = localToCamera.position;
-            //    this.transform.parent.Find("ViveMeter").transform.position = meter_position;
-            //    //smooth the drift amount by specified number
-            //    //Vector3 counter_drift_amount = localToCamera.position - meter_position;
-            //    //if (first_tracking)
-            //    //{
-            //    //    previous_drift_amount = counter_drift_amount;
-            //    //    counter_drift_total += counter_drift_amount;
-            //    //    drift_accum_curr++;
-            //    //    first_tracking = false;
-            //    //}
-            //    //else
-            //    //{
-            //    //    if (Math.Abs((counter_drift_amount - previous_drift_amount).magnitude) <= 0.05f)
-            //    //    {
-            //    //        //Adding a threshold to the difference two continuous data;
-            //    //        drift_accum_curr++;
-            //    //        previous_drift_amount = counter_drift_amount;
-            //    //        counter_drift_total += counter_drift_amount;
-            //    //    }
-            //    //}
-            //    //if (drift_accum_curr >= 30)
-            //    //{
-            //    //    Vector3 counter_drift_avg = counter_drift_total / 30;
-            //    //    meter_position = meter_position + counter_drift_avg;
-            //    //    this.transform.parent.Find("ViveMeter").position = meter_position;
-            //    //    drift_accum_curr = 0;
-            //    //    counter_drift_total = new Vector3(0, 0, 0);
-            //    //}
-
-            //    storedTable.transform.localPosition = storedTablePos;
-            //    storedTable.transform.localRotation = storedTableRot;
-            //    this.transform.parent.Find("Origin").transform.rotation = storedTable.transform.rotation;
-            //    this.transform.parent.Find("Origin").transform.position = storedTable.transform.position;
-            //}
-            //else
-            //{
-            //    Vector3 m_final_pos = new Vector3(mid_pos.x, mid_pos.z, -mid_pos.y);
-            //    Transform localToCamera = Camera.main.transform.Find("TrackerLocalToCamera");
-            //    localToCamera.localPosition = m_final_pos + stablePosCalib;
-            //    meter_position = localToCamera.position;
-            //    this.transform.parent.Find("ViveMeter").transform.position = meter_position;
-            //}
-
-            ////set tracker position
-            //mid_pos = this.rotateAroundAxis(t_pos_raw, new Vector3(0, 0, 0), re_m_rot);
-            ////position relative to vive meter
-            //Vector3 mid2_pos = new Vector3(-mid_pos.x, -mid_pos.z, mid_pos.y);
-            //Transform calibratedChildTrans = calibratedCamChild.transform;
-            //calibratedChildTrans.position = meter_position;
-            //calibratedChildTrans.localPosition = calibratedChildTrans.localPosition + mid2_pos;
-            //this.transform.position = calibratedChildTrans.position;
-
-            ////set tracker rotation
-            //Quaternion rot = TT1.rotation;
-
-            //rot = new Quaternion(rot.x, rot.z, -rot.y, rot.w);
-
-            //Quaternion change = rot_calib * rot;
-            //this.transform.localRotation = camera_rot * change;
-            ////Debug.Log(camera_rot * change );
             if (!ViveEmitter_calibrated)
             {
                 UpdateViveEmitterCalibration();
             }
 
             UpdateViveHoloTracker();
+        }
+        if (Instance.bTT_0 && !calibrating)
+        {
             if (ViveEmitter_calibrated)
             {
                 CalibrateViveWithHololens();
@@ -391,7 +307,7 @@ public class HoloReceiver : MonoBehaviour
 
     void CalibrateViveWithHololens()
     {
-        Vector3 HoloToTrackerDisplacement = new Vector3(0, 0.07f, 0.02f);
+        Vector3 HoloToTrackerDisplacement = new Vector3(0, 0.06f, 0.02f);
         //LEFT-handed Unity reference system
         Transform HoloCameraT = Camera.main.transform;
         Transform ViveHoloTrackerT = ViveHoloTracker.transform;
