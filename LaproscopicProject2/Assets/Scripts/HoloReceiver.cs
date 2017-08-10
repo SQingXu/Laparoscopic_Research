@@ -59,12 +59,12 @@ public class HoloReceiver : MonoBehaviour
     public int driftadjust_rate = 10;
     public string filename = "StoredTable.json";
     private Quaternion from0toTable;
-    Quaternion re_from0toTable;
-    private Vector3 meter_position;
-    private Vector3 counter_drift_total;
-    private Vector3 previous_drift_amount;
-    private int drift_accum_curr;
-    private Quaternion meter_rot;
+    //Quaternion re_from0toTable;
+    //private Vector3 meter_position;
+    //private Vector3 counter_drift_total;
+    //private Vector3 previous_drift_amount;
+    //private int drift_accum_curr;
+    //private Quaternion meter_rot;
     private Quaternion camera_rot;
     private Quaternion rot_calib;//need to be rotated before other rotation.
     private GameObject calibratedCam;
@@ -75,7 +75,8 @@ public class HoloReceiver : MonoBehaviour
     private Vector3 storedTablePos;
     private Quaternion storedTableRot;
     private bool calibrating = false;
-    private bool calib_confirmed = false;
+    Vector3 HoloToTrackerDisplacement = new Vector3(0, 0.058f, 0.056f);
+    //private bool calib_confirmed = false;
     private bool first_tracking = true;
 
     public GameObject ViveEmitter;
@@ -148,8 +149,6 @@ public class HoloReceiver : MonoBehaviour
         if (!CASTOrigin)
             CASTOrigin = GameObject.Find("Origin");
 
-        counter_drift_total = new Vector3(0, 0, 0);
-        drift_accum_curr = 0;
         camera_rot = new Quaternion(0, 0, 0, 1);
         //Debug.Log("HoloReceiver Started");
         // this.enabled = false;
@@ -197,6 +196,32 @@ public class HoloReceiver : MonoBehaviour
         {
             Debug.Log("E pressed");
             this.CalibrateViveEmitter();
+        }
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            //Debug.Log("Up Arrow Key pressed");
+            HoloToTrackerDisplacement += new Vector3(0, 0.002f, 0);
+            Debug.Log(HoloToTrackerDisplacement.ToString("F4"));
+        }
+        if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            //Debug.Log("Down Arrow Key pressed");
+            HoloToTrackerDisplacement += new Vector3(0, -0.002f, 0);
+            Debug.Log(HoloToTrackerDisplacement.ToString("F4"));
+        }
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            //Debug.Log("Right Arrow Key pressed");
+            //backward
+            HoloToTrackerDisplacement += new Vector3(0, 0, 0.002f);
+            Debug.Log(HoloToTrackerDisplacement.ToString("F4"));
+        }
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            //Debug.Log("Left Arrow Key pressed");
+            //forward
+            HoloToTrackerDisplacement += new Vector3(0, 0, -0.002f);
+            Debug.Log(HoloToTrackerDisplacement.ToString("F4"));
         }
         //if (Instance.bTT_1 && !calibrating)
         //{
@@ -307,22 +332,21 @@ public class HoloReceiver : MonoBehaviour
 
     void CalibrateViveWithHololens()
     {
-        Vector3 HoloToTrackerDisplacement = new Vector3(0, 0.06f, 0.02f);
         //LEFT-handed Unity reference system
         Transform HoloCameraT = Camera.main.transform;
         Transform ViveHoloTrackerT = ViveHoloTracker.transform;
         Vector3 ViveTrackerFromHoloPos = HoloCameraT.position + HoloCameraT.TransformVector(HoloToTrackerDisplacement);
-        Vector3 ViveToHololensTranslation = ViveTrackerFromHoloPos - ViveHoloTrackerT.position;
+        //Vector3 ViveToHololensTranslation = ViveTrackerFromHoloPos - ViveHoloTrackerT.position;
         Quaternion ViveTrackersRotation = ViveHoloTracker.transform.rotation * Quaternion.Inverse(ViveCASTTracker.transform.rotation); ;
         Quaternion ViveToHololensRotation = Quaternion.Euler(0, Quaternion.Inverse(ViveTrackersRotation * Quaternion.Inverse(HoloCameraT.rotation)).eulerAngles.y, 0);
 
         //LEFT-handed (converted from RIGHT-handed when receiving data)
-        TrackerTransform TrackerHoloT = Instance.lastTrackerTransform_0;
+        //TrackerTransform TrackerHoloT = Instance.lastTrackerTransform_0;
         //Vector3 EmitterFromVivePos = ViveHoloTracker.transform.position + ViveHoloTracker.transform.TransformVector (-TrackerHoloT.position);
         //Quaternion EmitterFromViveRot = ViveHoloTracker.transform.rotation * Quaternion.Inverse (TrackerHoloT.rotation);
-        Vector3 OriginFromVivePos = ViveCASTTracker.transform.position - ViveHoloTracker.transform.position;
-        Vector3 OriginFromHoloPos = ViveCASTTracker.transform.position - ViveTrackerFromHoloPos;
-        Quaternion OriginFromViveRot = ViveCASTTracker.transform.rotation * Quaternion.Inverse(ViveHoloTracker.transform.rotation);
+       // Vector3 OriginFromVivePos = ViveCASTTracker.transform.position - ViveHoloTracker.transform.position;
+        //Vector3 OriginFromHoloPos = ViveCASTTracker.transform.position - ViveTrackerFromHoloPos;
+        //Quaternion OriginFromViveRot = ViveCASTTracker.transform.rotation * Quaternion.Inverse(ViveHoloTracker.transform.rotation);
         //ViveCASTTrackerDebug.transform.position = ViveTrackerFromHoloPos +  Camera.main.transform.TransformVector (OriginFromVivePos);
 
         Quaternion FinalCASTOriginRot = ViveToHololensRotation;
@@ -376,7 +400,7 @@ public class HoloReceiver : MonoBehaviour
         {
             Debug.Log("Start Calibration Procedure");
             calibrating = true;
-            calib_confirmed = false;
+            //calib_confirmed = false;
             tableParent.transform.position = this.transform.position;
             tableParent.transform.rotation = this.transform.rotation;
             Vector3 tableCalib = new Vector3(0, -0.155f, 0);
@@ -419,7 +443,7 @@ public class HoloReceiver : MonoBehaviour
         String jsonStored = JsonUtility.ToJson(storedT);
         String filePath = Path.Combine(Application.streamingAssetsPath, filename);
         File.WriteAllText(filePath, jsonStored);
-        calib_confirmed = true;
+        //calib_confirmed = true;
     }
 
     public void LoadTableCalibration()
@@ -433,7 +457,7 @@ public class HoloReceiver : MonoBehaviour
             StoredTransform storedT = JsonUtility.FromJson<StoredTransform>(jsonString);
             storedTablePos = storedT.StoredPosition;
             storedTableRot = storedT.StoredRotation;
-            calib_confirmed = true;
+            //calib_confirmed = true;
         }
         else
         {

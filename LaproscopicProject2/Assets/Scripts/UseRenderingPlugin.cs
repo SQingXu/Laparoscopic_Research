@@ -106,6 +106,14 @@ public class UseRenderingPlugin : MonoBehaviour
             }
                 
         }
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            this.transform.localScale = new Vector3(this.transform.localScale.x - 0.01f, this.transform.localScale.y, this.transform.localScale.z);
+        }
+        if (Input.GetKeyDown(KeyCode.Z))
+        {
+            this.transform.localScale = new Vector3(this.transform.localScale.x, this.transform.localScale.y - 0.01f, this.transform.localScale.z);
+        }
     }
     private void OnDestroy()
     {

@@ -71,7 +71,7 @@ public class CastReceiver : MonoBehaviour
         rightInstruPivotTransf = GameObject.Find("RightInstrumentParent").transform;
         //leftInstruLength = GameObject.Find("LeftInstrument").transform.localScale.y * 2; //cylinder's total length is twice what the y is
         //rightInstruLength = GameObject.Find("RightInstrument").transform.localScale.y * 2;
-        leftInstruLength = 0.0378f;
+        leftInstruLength = 0.02f;
         rightInstruLength = 0.019f;
         
         parentdup_left = new GameObject("LeftInstrumentDuplicate");
