@@ -172,7 +172,14 @@ public class HoloReceiver : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.C) && !calibrating)
         {
             //this.StartCalibrateOrigin();
-            this.CalibrateViveWithHololens();
+            //this.CalibrateViveWithHololens();
+            if (Instance.bTT_0 && !calibrating)
+            {
+                if (ViveEmitter_calibrated)
+                {
+                    CalibrateViveWithHololens();
+                }
+            }
             Debug.Log("C pressed");
         }
         if (Input.GetKeyDown(KeyCode.H) && !calibrating)
@@ -310,6 +317,7 @@ public class HoloReceiver : MonoBehaviour
                 CalibrateViveWithHololens();
             }
         }
+
     }
 
     void UpdateViveEmitterCalibration()

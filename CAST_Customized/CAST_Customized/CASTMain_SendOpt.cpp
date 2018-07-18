@@ -12,7 +12,7 @@ int main()
 	setupSocket("152.2.130.69","8500");
 	std::cout << "Socket set up successfully\n";
 
-	CHardware gHw = CHardware();
+	CHardware gHw;
 	int scanRes = gHw.scanUSB4();
 	int initRes = _FAIL_;
 	if(scanRes == _OK_){
